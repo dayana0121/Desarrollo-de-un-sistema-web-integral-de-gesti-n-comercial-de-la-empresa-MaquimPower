@@ -354,8 +354,17 @@ builder.Services.AddHttpContextAccessor();
 ## 👨‍💻 Autor
 
 **E1 - Sistema Integral de Gestión**  
+**Trabajo realizado en equipo por:**
+- Albornoz Nava Julio
+- Caigua Burguillos Dylan
+- Carrión Espinoza Dayana
+- Galiano Acuña Diego
+- Morales Moreno Edinson
+- Vergara Tafur Kenia
+**Estudiantes de la carrera de Desarrollo de Software del quinto semestre - Senati**
 Desarrollado con ASP.NET Core 8 y SQL Server
 
 ---
 
 **Versión:** 1.0
+**2026**
