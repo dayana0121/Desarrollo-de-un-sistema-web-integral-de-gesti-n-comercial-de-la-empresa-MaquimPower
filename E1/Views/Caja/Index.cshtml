@@ -1,0 +1,247 @@
+﻿@{
+    ViewData["Title"] = "Caja";
+    var cajaAbierta = ViewBag.CajaAbierta as E1.Models.Caja;
+    var movimientos = ViewBag.Movimientos as List<E1.Models.MovimientoCaja> ?? new List<E1.Models.MovimientoCaja>();
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0" style="font-weight:800;color:var(--text-primary);">Caja</h1>
+            <p class="text-muted mb-0">Control de apertura, movimientos y cierre de caja diaria</p>
+        </div>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    @if (cajaAbierta == null)
+    {
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card-module">
+                    <div class="card-module-header">
+                        <div>
+                            <h2><i class="fa-solid fa-lock-open me-2 text-success"></i>Abrir Caja</h2>
+                            <p>Ingresa el monto inicial para comenzar operaciones</p>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre de caja</label>
+                            <input type="text" id="nombre_caja" class="form-control" value="Caja Principal" />
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Monto de apertura (S/)</label>
+                            <input type="number" id="monto_apertura" class="form-control" min="0" step="0.01" value="0.00" />
+                        </div>
+                        <button class="btn-primary-mp w-100" onclick="abrirCaja()">
+                            <i class="fa-solid fa-play me-2"></i>Abrir Caja
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- KPI Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card-module" style="border-left:4px solid #22c55e;">
+                    <div class="p-3">
+                        <div class="text-muted small mb-1">Caja activa</div>
+                        <div class="fw-bold fs-5" style="color:var(--text-primary);">@cajaAbierta.nombre_caja</div>
+                        <div class="text-muted small">Abierta @cajaAbierta.fecha_apertura.ToString("dd/MM/yyyy HH:mm")</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card-module" style="border-left:4px solid var(--accent);">
+                    <div class="p-3">
+                        <div class="text-muted small mb-1">Monto apertura</div>
+                        <div class="fw-bold fs-4" style="color:var(--accent);">S/ @cajaAbierta.monto_apertura.ToString("N2")</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card-module" style="border-left:4px solid #3b82f6;">
+                    <div class="p-3">
+                        <div class="text-muted small mb-1">Total ingresos</div>
+                        <div class="fw-bold fs-4" style="color:#3b82f6;">
+                            S/ @movimientos.Where(m => m.tipo == "INGRESO").Sum(m => m.monto).ToString("N2")
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card-module" style="border-left:4px solid #ef4444;">
+                    <div class="p-3">
+                        <div class="text-muted small mb-1">Total egresos</div>
+                        <div class="fw-bold fs-4" style="color:#ef4444;">
+                            S/ @movimientos.Where(m => m.tipo == "EGRESO").Sum(m => m.monto).ToString("N2")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <!-- Panel izquierdo: movimiento + cierre -->
+            <div class="col-md-4">
+                <div class="card-module mb-3">
+                    <div class="card-module-header">
+                        <div>
+                            <h2>Registrar Movimiento</h2>
+                            <p>Ingresos o egresos manuales de caja</p>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <div class="mb-2">
+                            <label class="form-label">Tipo</label>
+                            <select id="mov_tipo" class="form-select">
+                                <option value="INGRESO">INGRESO</option>
+                                <option value="EGRESO">EGRESO</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Concepto</label>
+                            <input type="text" id="mov_concepto" class="form-control" placeholder="Ej: Pago proveedor" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Monto (S/)</label>
+                            <input type="number" id="mov_monto" class="form-control" min="0.01" step="0.01" />
+                        </div>
+                        <button class="btn-primary-mp w-100" onclick="registrarMovimiento(@cajaAbierta.id_caja)">
+                            <i class="fa-solid fa-plus me-1"></i>Registrar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-module">
+                    <div class="card-module-header">
+                        <div>
+                            <h2>Cerrar Caja</h2>
+                            <p>Cuadre y cierre de operaciones</p>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <div class="mb-2">
+                            <label class="form-label">Monto contado (S/)</label>
+                            <input type="number" id="monto_cierre" class="form-control" min="0" step="0.01" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Observación (opcional)</label>
+                            <input type="text" id="obs_cierre" class="form-control" />
+                        </div>
+                        <button class="w-100 fw-semibold" style="background:#ef4444;color:#fff;border:none;border-radius:8px;padding:10px;" onclick="cerrarCaja(@cajaAbierta.id_caja)">
+                            <i class="fa-solid fa-lock me-2"></i>Cerrar Caja
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel derecho: movimientos -->
+            <div class="col-md-8">
+                <div class="card-module">
+                    <div class="card-module-header">
+                        <div>
+                            <h2>Movimientos del día</h2>
+                            <p>Historial de ingresos y egresos de esta sesión</p>
+                        </div>
+                    </div>
+                    <div class="table-responsive" style="max-height:480px;overflow-y:auto;">
+                        <table class="table table-hover align-middle w-100">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Tipo</th>
+                                    <th>Concepto</th>
+                                    <th class="text-end">Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var m in movimientos)
+                                {
+                                    <tr>
+                                        <td class="small text-muted">@m.fecha_creacion.ToString("dd/MM HH:mm")</td>
+                                        <td>
+                                            @if (m.tipo == "INGRESO")
+                                            {
+                                                <span class="badge-active">INGRESO</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge-inactive">EGRESO</span>
+                                            }
+                                        </td>
+                                        <td>@m.concepto</td>
+                                        <td class="text-end fw-semibold" style="color:@(m.tipo == "INGRESO" ? "#22c55e" : "#ef4444")">
+                                            S/ @m.monto.ToString("N2")
+                                        </td>
+                                    </tr>
+                                }
+                                @if (!movimientos.Any())
+                                {
+                                    <tr><td colspan="4" class="text-center text-muted py-4">Sin movimientos registrados</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        async function abrirCaja() {
+            const nombre = document.getElementById('nombre_caja').value.trim();
+            const monto = parseFloat(document.getElementById('monto_apertura').value) || 0;
+            if (!nombre) { showAlert('Ingresa el nombre de la caja', 'error'); return; }
+            const res = await fetch('/Caja/Abrir', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'nombre_caja=' + encodeURIComponent(nombre) + '&monto_apertura=' + monto
+            });
+            const data = await res.json();
+            if (data.ok) { showAlert(data.msg, 'success'); setTimeout(() => location.reload(), 800); }
+            else showAlert(data.msg, 'error');
+        }
+
+        async function registrarMovimiento(idCaja) {
+            const tipo = document.getElementById('mov_tipo').value;
+            const concepto = document.getElementById('mov_concepto').value.trim();
+            const monto = parseFloat(document.getElementById('mov_monto').value) || 0;
+            if (!concepto || monto <= 0) { showAlert('Completa concepto y monto', 'error'); return; }
+            const res = await fetch('/Caja/RegistrarMovimiento', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'id_caja=' + idCaja + '&tipo=' + tipo + '&concepto=' + encodeURIComponent(concepto) + '&monto=' + monto
+            });
+            const data = await res.json();
+            if (data.ok) { showAlert(data.msg, 'success'); setTimeout(() => location.reload(), 800); }
+            else showAlert(data.msg, 'error');
+        }
+
+        async function cerrarCaja(idCaja) {
+            const monto = parseFloat(document.getElementById('monto_cierre').value);
+            const obs = document.getElementById('obs_cierre').value.trim();
+            if (isNaN(monto) || monto < 0) { showAlert('Ingresa el monto contado', 'error'); return; }
+            if (!confirm('¿Confirmas el cierre de caja?')) return;
+            const res = await fetch('/Caja/Cerrar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'id_caja=' + idCaja + '&monto_cierre=' + monto + '&observacion=' + encodeURIComponent(obs)
+            });
+            const data = await res.json();
+            if (data.ok) {
+                showAlert(data.msg + ' | Esperado: S/ ' + (data.esperado||0).toFixed(2) + ' | Diferencia: S/ ' + (data.diferencia||0).toFixed(2), 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else showAlert('Error: ' + data.msg, 'error');
+        }
+    </script>
+}

@@ -1,0 +1,140 @@
+﻿@{
+    ViewData["Title"] = "Estados de Venta";
+    var estados = ViewBag.Estados as List<E1.Models.EstadoVenta> ?? new List<E1.Models.EstadoVenta>();
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0" style="font-weight:800;color:var(--text-primary);">Ventas</h1>
+            <p class="text-muted mb-0">Gestione ventas, cotizaciones y estados</p>
+        </div>
+    </div>
+
+    <div class="module-tabs">
+        <a href="/Ventas/POS">POS</a>
+        <a href="/Ventas/Historial">Historial</a>
+        <a href="/Ventas/Cotizaciones">Cotizaciones</a>
+        <a href="/Ventas/Estados" class="active">Estados</a>
+    </div>
+
+    <div class="card-module">
+        <div class="card-module-header">
+            <div>
+                <h2>Estados de Venta</h2>
+                <p>Configure los estados disponibles para las ventas</p>
+            </div>
+            <button class="btn-primary-mp" onclick="abrirModal(0)">
+                <i class="fa-solid fa-plus"></i> Nuevo Estado
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle w-100">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Código</th>
+                        <th>Estado</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in estados)
+                    {
+                        <tr>
+                            <td class="text-muted small">@e.id_estado_venta</td>
+                            <td>@e.nombre</td>
+                            <td><code style="color:var(--accent);">@e.codigo</code></td>
+                            <td>
+                                @if (e.estado)
+                                {
+                                    <span class="badge-active">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-inactive">Inactivo</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <button class="action-btn btn-edit me-1" onclick="abrirModal(@e.id_estado_venta, '@e.nombre', '@e.codigo')">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button class="action-btn btn-delete" onclick="eliminarEstado(@e.id_estado_venta)">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                    @if (!estados.Any())
+                    {
+                        <tr><td colspan="5" class="text-center text-muted py-4">No hay estados registrados</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalEstado" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-tag text-warning me-2"></i>Estado de Venta</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="est_id" value="0" />
+                <div class="mb-3">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" id="est_nombre" class="form-control" placeholder="Ej: Completado" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Código</label>
+                    <input type="text" id="est_codigo" class="form-control" placeholder="Ej: COMP" maxlength="20" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary-mp" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn-primary-mp" onclick="guardarEstado()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function abrirModal(id, nombre, codigo) {
+            document.getElementById('est_id').value = id || 0;
+            document.getElementById('est_nombre').value = nombre || '';
+            document.getElementById('est_codigo').value = codigo || '';
+            new bootstrap.Modal(document.getElementById('modalEstado')).show();
+        }
+        async function guardarEstado() {
+            const id = document.getElementById('est_id').value;
+            const nombre = document.getElementById('est_nombre').value.trim();
+            const codigo = document.getElementById('est_codigo').value.trim();
+            if (!nombre || !codigo) { showAlert('Completa nombre y código', 'error'); return; }
+            const res = await fetch('/Ventas/GuardarEstado', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'id_estado_venta=' + id + '&nombre=' + encodeURIComponent(nombre) + '&codigo=' + encodeURIComponent(codigo)
+            });
+            const data = await res.json();
+            if (data.ok) { showAlert(data.msg, 'success'); setTimeout(() => location.reload(), 800); }
+            else showAlert(data.msg, 'error');
+        }
+        async function eliminarEstado(id) {
+            if (!confirm('¿Desactivar este estado?')) return;
+            const res = await fetch('/Ventas/EliminarEstado', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'id=' + id
+            });
+            const data = await res.json();
+            if (data.ok) { showAlert(data.msg, 'success'); setTimeout(() => location.reload(), 800); }
+            else showAlert(data.msg, 'error');
+        }
+    </script>
+}

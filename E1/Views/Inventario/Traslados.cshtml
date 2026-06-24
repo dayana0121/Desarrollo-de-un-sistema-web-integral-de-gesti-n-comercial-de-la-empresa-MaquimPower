@@ -1,0 +1,212 @@
+﻿@{
+    ViewData["Title"] = "Traslados";
+}
+
+<div class="terceros-page">
+
+    <div class="terceros-header">
+        <h1>Inventario</h1>
+        <p>Traslados entre almacenes</p>
+    </div>
+
+    <div class="terceros-tabs">
+        <a href="/Inventario/Index" class="tab">
+            <i class="fa-solid fa-warehouse"></i> Almacenes
+        </a>
+
+        <a href="/Inventario/Movimientos" class="tab">
+            <i class="fa-solid fa-list-check"></i> Movimientos / Kardex
+        </a>
+
+        <a href="/Inventario/Traslados" class="tab active">
+            <i class="fa-solid fa-right-left"></i> Traslados
+        </a>
+    </div>
+
+    <div class="terceros-card">
+
+        <div class="card-top">
+            <div>
+                <h2>Lista de Traslados</h2>
+                <p>Mueva mercadería de un almacén origen hacia un almacén destino</p>
+            </div>
+
+            <button type="button" class="btn-orange" onclick="abrirModalNuevoTraslado()">
+                <i class="fa-solid fa-plus"></i>
+                Nuevo Traslado
+            </button>
+        </div>
+
+        <div class="filters proveedores-filters">
+            <div>
+                <label>Buscar traslado</label>
+                <input id="buscarTraslado" placeholder="Ej. TR-0001 / Principal / Tienda..." />
+            </div>
+
+            <div>
+                <label>Estado</label>
+                <select id="filtroEstadoTraslado">
+                    <option value="">-- Todos --</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Confirmado">Confirmado</option>
+                    <option value="Anulado">Anulado</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn-orange" onclick="filtrarTraslados()">
+                <i class="fa-solid fa-filter"></i> Filtrar
+            </button>
+
+            <button type="button" class="btn-reset" onclick="limpiarFiltrosTraslados()">
+                <i class="fa-solid fa-rotate-right"></i>
+            </button>
+        </div>
+
+        <table id="tblTraslados" class="display terceros-table" style="width:100%">
+            <thead>
+                <tr>
+                    <th>N° TRASLADO</th>
+                    <th>ORIGEN</th>
+                    <th>DESTINO</th>
+                    <th>FECHA</th>
+                    <th>ESTADO</th>
+                    <th>OBSERVACIÓN</th>
+                    <th>ACCIONES</th>
+                </tr>
+            </thead>
+        </table>
+
+    </div>
+</div>
+
+<div class="modal fade" id="modalTraslado" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content modal-mp">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloModalTraslado">Nuevo Traslado</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="formTraslado">
+                <div class="modal-body">
+
+                    <input type="hidden" id="id_traslado" value="0" />
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label>Almacén Origen</label>
+                            <select id="id_almacen_origen" class="form-control input-mp" required>
+                                <option value="">Seleccione origen</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label>Almacén Destino</label>
+                            <select id="id_almacen_destino" class="form-control input-mp" required>
+                                <option value="">Seleccione destino</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label>Observación</label>
+                            <input id="observacion_traslado"
+                                   class="form-control input-mp"
+                                   maxlength="300"
+                                   placeholder="Opcional" />
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row align-items-end">
+                        <div class="col-md-6 mb-3">
+                            <label>Producto</label>
+                            <select id="productoTraslado" class="form-control input-mp">
+                                <option value="">Seleccione producto</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label>Cantidad</label>
+                            <input id="cantidadTraslado"
+                                   type="number"
+                                   min="1"
+                                   step="1"
+                                   class="form-control input-mp" />
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <button type="button" class="btn-orange w-100" onclick="agregarProductoTraslado()">
+                                <i class="fa-solid fa-plus"></i>
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+
+                    <table class="table terceros-table" id="tblDetalleTraslado">
+                        <thead>
+                            <tr>
+                                <th>PRODUCTO</th>
+                                <th>CANTIDAD</th>
+                                <th>ACCIÓN</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">
+                                    No hay productos agregados.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-reset" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn-orange">
+                        Guardar Traslado
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDetalleTraslado" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content modal-mp">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Detalle de Traslado</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <table class="table terceros-table" id="tblDetalleTrasladoVista">
+                    <thead>
+                        <tr>
+                            <th>PRODUCTO</th>
+                            <th>CANTIDAD</th>
+                        </tr>
+                    </thead>
+
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-reset" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

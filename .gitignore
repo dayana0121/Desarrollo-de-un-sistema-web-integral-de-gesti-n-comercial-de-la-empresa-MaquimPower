@@ -1,0 +1,17 @@
+﻿# Extensiones e IA locales
+.ai_completion/
+.code_contribution/
+*.db
+
+# Archivos de Visual Studio
+.vs/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Dependencias pesadas (si aplica)
+node_modules/
+vendor/

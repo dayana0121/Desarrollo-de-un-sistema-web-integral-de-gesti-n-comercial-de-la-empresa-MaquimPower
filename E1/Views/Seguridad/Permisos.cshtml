@@ -1,0 +1,273 @@
+@{
+    ViewData["Title"] = "Gestión de Permisos";
+    var permisos = ViewBag.Permisos as List<E1.Models.Permiso> ?? new List<E1.Models.Permiso>();
+}
+
+<div class="terceros-page">
+    <div class="terceros-header">
+        <h1>Seguridad</h1>
+        <p>Gestione accesos, roles, permisos y usuarios del sistema</p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="terceros-tabs">
+        <a href="/Seguridad" class="tab"><i class="fa-solid fa-user-shield"></i> Roles</a>
+        <a href="/Seguridad/Permisos" class="tab active"><i class="fa-solid fa-key"></i> Permisos</a>
+        <a href="/Seguridad/AccesosPorRol" class="tab"><i class="fa-solid fa-universal-access"></i> Accesos por Rol</a>
+        <a href="/Seguridad/Usuarios" class="tab"><i class="fa-solid fa-users-gear"></i> Usuarios</a>
+    </div>
+
+    <!-- Card Module -->
+    <div class="terceros-card">
+        <div class="card-module-header">
+            <div>
+                <h2>Permisos del Sistema</h2>
+                <p>Configure permisos granulares para las operaciones del ERP</p>
+            </div>
+            <button class="btn-primary-mp" data-bs-toggle="modal" data-bs-target="#modalCrearPermiso">
+                <i class="fa-solid fa-plus"></i> Nuevo Permiso
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table id="tblPermisos" class="table table-hover align-middle w-100">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">ID</th>
+                        <th>Nombre</th>
+                        <th>Código Único</th>
+                        <th>Módulo</th>
+                        <th>Acción</th>
+                        <th>Estado</th>
+                        <th style="width: 120px;" class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in permisos)
+                    {
+                        <tr>
+                            <td>@p.id_permiso</td>
+                            <td>@p.nombre</td>
+                            <td><code style="color: var(--accent);">@p.codigo</code></td>
+                            <td>@p.modulo</td>
+                            <td>
+                                <span class="badge" style="background-color: rgba(249, 115, 22, 0.12); color: var(--accent);">@p.accion</span>
+                            </td>
+                            <td>
+                                @if (p.estado)
+                                {
+                                    <span class="badge-active">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-inactive">Inactivo</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <button class="action-btn btn-edit me-1" onclick="editarPermiso(@p.id_permiso, '@p.nombre', '@p.codigo', '@p.modulo', '@p.accion', @(p.estado ? "true" : "false"))">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button class="action-btn btn-delete" onclick="eliminarPermiso(@p.id_permiso, '@p.nombre')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Crear Permiso -->
+<div class="modal fade" id="modalCrearPermiso" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-key text-warning me-2"></i> Crear Nuevo Permiso</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="frmCrearPermiso">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Permiso</label>
+                        <input type="text" name="nombre" class="form-control-custom w-100" placeholder="Ej. Crear Productos" required maxlength="100" autocomplete="off" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Código del Permiso (Único)</label>
+                        <input type="text" name="codigo" class="form-control-custom w-100" placeholder="Ej. PRODUCTO_CREAR" required maxlength="50" autocomplete="off" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Módulo</label>
+                        <select name="modulo" class="form-select w-100" required>
+                            <option value="Dashboard">Dashboard</option>
+                            <option value="Configuracion">Configuración</option>
+                            <option value="Terceros">Terceros</option>
+                            <option value="Productos">Productos</option>
+                            <option value="Compras">Compras</option>
+                            <option value="Inventario">Inventario</option>
+                            <option value="Caja">Caja</option>
+                            <option value="Ventas">Ventas</option>
+                            <option value="Seguridad">Seguridad</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Acción</label>
+                        <select name="accion" class="form-select w-100" required>
+                            <option value="VIEW">VIEW (Ver)</option>
+                            <option value="CREATE">CREATE (Crear)</option>
+                            <option value="EDIT">EDIT (Editar)</option>
+                            <option value="DELETE">DELETE (Eliminar)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary-mp" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-primary-mp">Crear Permiso</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Permiso -->
+<div class="modal fade" id="modalEditarPermiso" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-pen text-warning me-2"></i> Editar Permiso</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="frmEditarPermiso">
+                <input type="hidden" name="id_permiso" id="edit_id_permiso" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Permiso</label>
+                        <input type="text" name="nombre" id="edit_nombre" class="form-control-custom w-100" required maxlength="100" autocomplete="off" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Código del Permiso</label>
+                        <input type="text" name="codigo" id="edit_codigo" class="form-control-custom w-100" required maxlength="50" autocomplete="off" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Módulo</label>
+                        <select name="modulo" id="edit_modulo" class="form-select w-100" required>
+                            <option value="Dashboard">Dashboard</option>
+                            <option value="Configuracion">Configuración</option>
+                            <option value="Terceros">Terceros</option>
+                            <option value="Productos">Productos</option>
+                            <option value="Compras">Compras</option>
+                            <option value="Inventario">Inventario</option>
+                            <option value="Caja">Caja</option>
+                            <option value="Ventas">Ventas</option>
+                            <option value="Seguridad">Seguridad</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Acción</label>
+                        <select name="accion" id="edit_accion" class="form-select w-100" required>
+                            <option value="VIEW">VIEW (Ver)</option>
+                            <option value="CREATE">CREATE (Crear)</option>
+                            <option value="EDIT">EDIT (Editar)</option>
+                            <option value="DELETE">DELETE (Eliminar)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Estado</label>
+                        <select name="estado" id="edit_estado" class="form-select w-100">
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary-mp" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-primary-mp">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#tblPermisos').DataTable();
+
+            // Submit Crear Permiso
+            $('#frmCrearPermiso').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/Seguridad/CrearPermiso',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(res) {
+                        if (res.ok) {
+                            $('#modalCrearPermiso').modal('hide');
+                            showAlert(res.msg, 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg, 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error en la comunicación con el servidor', 'error');
+                    }
+                });
+            });
+
+            // Submit Editar Permiso
+            $('#frmEditarPermiso').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/Seguridad/ActualizarPermiso',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(res) {
+                        if (res.ok) {
+                            $('#modalEditarPermiso').modal('hide');
+                            showAlert(res.msg, 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg, 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error en la comunicación con el servidor', 'error');
+                    }
+                });
+            });
+        });
+
+        function editarPermiso(id, nombre, codigo, modulo, accion, estado) {
+            $('#edit_id_permiso').val(id);
+            $('#edit_nombre').val(nombre);
+            $('#edit_codigo').val(codigo);
+            $('#edit_modulo').val(modulo);
+            $('#edit_accion').val(accion);
+            $('#edit_estado').val(estado.toString());
+            $('#modalEditarPermiso').modal('show');
+        }
+
+        function eliminarPermiso(id, nombre) {
+            if (confirm(`¿Está seguro de que desea desactivar el permiso "${nombre}"?`)) {
+                $.ajax({
+                    url: '/Seguridad/EliminarPermiso',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function(res) {
+                        if (res.ok) {
+                            showAlert(res.msg || 'Permiso desactivado correctamente', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg || 'No se pudo desactivar el permiso', 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error al procesar la solicitud', 'error');
+                    }
+                });
+            }
+        }
+    </script>
+}

@@ -1,0 +1,392 @@
+@{
+    ViewData["Title"] = "Gestión de Productos";
+    var productos = ViewBag.Productos as List<dynamic> ?? new List<dynamic>();
+    var categorias = ViewBag.Categorias as List<E1.Models.Categoria> ?? new List<E1.Models.Categoria>();
+    var marcas = ViewBag.Marcas as List<E1.Models.Marca> ?? new List<E1.Models.Marca>();
+    var proveedores = ViewBag.Proveedores as List<E1.Models.Proveedor> ?? new List<E1.Models.Proveedor>();
+}
+
+<div class="terceros-page">
+    <div class="terceros-header">
+        <h1>Productos</h1>
+        <p>Gestione el catálogo de categorías, marcas, proveedores y productos</p>
+    </div>
+
+    <div class="terceros-info" style="margin-top: 0; margin-bottom: 24px;">
+        <div class="info-icon">
+            <i class="fa-solid fa-circle-info"></i>
+        </div>
+        <div>
+            <h3>Información</h3>
+            <p>Los productos registran la información de la mercadería disponible en almacén, incluyendo SKU, precios y niveles de stock.</p>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="terceros-tabs">
+        <a href="/Productos" class="tab active"><i class="fa-solid fa-box"></i> Productos</a>
+        <a href="/Productos/Categorias" class="tab"><i class="fa-solid fa-tags"></i> Categorías</a>
+        <a href="/Productos/Marcas" class="tab"><i class="fa-solid fa-trademark"></i> Marcas</a>
+    </div>
+
+    <!-- Card Module -->
+    <div class="terceros-card">
+        <div class="card-module-header">
+            <div>
+                <h2>Lista de Productos</h2>
+                <p>Monitoree precios, SKU y niveles de stock de mercadería</p>
+            </div>
+            <button class="btn-primary-mp" data-bs-toggle="modal" data-bs-target="#modalCrearProducto">
+                <i class="fa-solid fa-plus"></i> Nuevo Producto
+            </button>
+        </div>
+
+        <!-- Filtros de búsqueda a nivel de controlador -->
+        <form method="get" action="/Productos" class="row g-3 mb-4 align-items-end">
+            <div class="col-12 col-md-3">
+                <label class="form-label">Buscar por SKU o Nombre</label>
+                <input type="text" name="busqueda" class="form-control" value="@ViewBag.Busqueda" placeholder="Ej. LUBR-123..." autocomplete="off" />
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label">Categoría</label>
+                <select name="id_categoria" class="form-select">
+                    <option value="">-- Todas --</option>
+                    @foreach (var c in categorias)
+                    {
+                        <!option value="@c.id_categoria" @(ViewBag.FiltroCategoria == c.id_categoria ? "selected" : "")>@c.nombre</!option>
+                    }
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label">Marca</label>
+                <select name="id_marca" class="form-select">
+                    <option value="">-- Todas --</option>
+                    @foreach (var m in marcas)
+                    {
+                        <!option value="@m.id_marca" @(ViewBag.FiltroMarca == m.id_marca ? "selected" : "")>@m.nombre</!option>
+                    }
+                </select>
+            </div>
+            <div class="col-12 col-md-3 d-flex gap-2">
+                <button type="submit" class="btn-primary-mp flex-grow-1">
+                    <i class="fa-solid fa-filter"></i> Filtrar
+                </button>
+                <a href="/Productos" class="btn-secondary-mp d-flex align-items-center justify-content-center" style="width: 44px; height: 38px;">
+                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                </a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table id="tblProductos" class="table table-hover align-middle w-100">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">SKU</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Marca</th>
+                        <th>Proveedor</th>
+                        <th class="text-end">P. Costo</th>
+                        <th class="text-end">P. Venta</th>
+                        <th class="text-center">Stock</th>
+                        <th>Estado</th>
+                        <th style="width: 100px;" class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in productos)
+                    {
+                        bool stockBajo = p.stock_actual <= p.stock_minimo;
+                        <tr>
+                            <td><code style="color: var(--accent);">@p.sku</code></td>
+                            <td>@p.nombre</td>
+                            <td>@p.nombre_categoria</td>
+                            <td>@p.nombre_marca</td>
+                            <td>@p.nombre_proveedor</td>
+                            <td class="text-end">S/ @p.precio_costo.ToString("N2")</td>
+                            <td class="text-end">S/ @p.precio_venta.ToString("N2")</td>
+                            <td class="text-center">
+                                @if (stockBajo)
+                                {
+                                    <span class="badge bg-danger text-white" title="Stock por debajo del mínimo (@p.stock_minimo)">
+                                        <i class="fa-solid fa-triangle-exclamation"></i> @p.stock_actual
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success text-white">@p.stock_actual</span>
+                                }
+                            </td>
+                            <td>
+                                @if (p.estado)
+                                {
+                                    <span class="badge-active">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-inactive">Inactivo</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <button class="action-btn btn-edit me-1" 
+                                        onclick="editarProducto(@p.id_producto, '@p.id_categoria', '@p.id_marca', '@p.id_proveedor', '@p.sku', '@p.nombre', '@p.descripcion', @(((decimal)p.precio_costo).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)), @(((decimal)p.precio_venta).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)), @p.stock_minimo, @(p.estado ? "true" : "false"))">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button class="action-btn btn-delete" onclick="eliminarProducto(@p.id_producto, '@p.nombre')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Crear Producto -->
+<div class="modal fade" id="modalCrearProducto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-box text-warning me-2"></i> Crear Nuevo Producto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="frmCrearProducto">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">SKU / Código Único</label>
+                            <input type="text" name="sku" class="form-control" placeholder="Ej. LUBR-PRO-01" required maxlength="30" autocomplete="off" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Nombre del Producto</label>
+                            <input type="text" name="nombre" class="form-control" placeholder="Ej. Aceite Sintético 10W40" required maxlength="150" autocomplete="off" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Descripción</label>
+                            <textarea name="descripcion" class="form-control" placeholder="Detalle adicional del producto..." rows="2" maxlength="300"></textarea>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Categoría</label>
+                            <select name="id_categoria" class="form-select" required>
+                                <option value="">-- Seleccionar --</option>
+                                @foreach (var c in categorias)
+                                {
+                                    <option value="@c.id_categoria">@c.nombre</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Marca</label>
+                            <select name="id_marca" class="form-select" required>
+                                <option value="">-- Seleccionar --</option>
+                                @foreach (var m in marcas)
+                                {
+                                    <option value="@m.id_marca">@m.nombre</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Proveedor</label>
+                            <select name="id_proveedor" class="form-select" required>
+                                <option value="">-- Seleccionar --</option>
+                                @foreach (var pr in proveedores)
+                                {
+                                    <option value="@pr.id_proveedor">@pr.razon_social</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Precio Costo (S/)</label>
+                            <input type="number" step="0.01" name="precio_costo" class="form-control" placeholder="0.00" required min="0" />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Precio Venta (S/)</label>
+                            <input type="number" step="0.01" name="precio_venta" class="form-control" placeholder="0.00" required min="0" />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Stock Mínimo Alerta</label>
+                            <input type="number" name="stock_minimo" class="form-control" placeholder="5" required min="0" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary-mp" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-primary-mp">Crear Producto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Producto -->
+<div class="modal fade" id="modalEditarProducto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-pen text-warning me-2"></i> Editar Producto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="frmEditarProducto">
+                <input type="hidden" name="id_producto" id="edit_id_producto" />
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">SKU / Código Único</label>
+                            <input type="text" name="sku" id="edit_sku" class="form-control" required maxlength="30" autocomplete="off" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Nombre del Producto</label>
+                            <input type="text" name="nombre" id="edit_nombre" class="form-control" required maxlength="150" autocomplete="off" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Descripción</label>
+                            <textarea name="descripcion" id="edit_descripcion" class="form-control" rows="2" maxlength="300"></textarea>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Categoría</label>
+                            <select name="id_categoria" id="edit_id_categoria" class="form-select" required>
+                                @foreach (var c in categorias)
+                                {
+                                    <option value="@c.id_categoria">@c.nombre</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Marca</label>
+                            <select name="id_marca" id="edit_id_marca" class="form-select" required>
+                                @foreach (var m in marcas)
+                                {
+                                    <option value="@m.id_marca">@m.nombre</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Proveedor</label>
+                            <select name="id_proveedor" id="edit_id_proveedor" class="form-select" required>
+                                @foreach (var pr in proveedores)
+                                {
+                                    <option value="@pr.id_proveedor">@pr.razon_social</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Precio Costo (S/)</label>
+                            <input type="number" step="0.01" name="precio_costo" id="edit_precio_costo" class="form-control" required min="0" />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Precio Venta (S/)</label>
+                            <input type="number" step="0.01" name="precio_venta" id="edit_precio_venta" class="form-control" required min="0" />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Stock Mínimo Alerta</label>
+                            <input type="number" name="stock_minimo" id="edit_stock_minimo" class="form-control" required min="0" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Estado</label>
+                            <select name="estado" id="edit_estado" class="form-select">
+                                <option value="true">Activo</option>
+                                <option value="false">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary-mp" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-primary-mp">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#tblProductos').DataTable({
+                dom: '<"d-flex justify-content-between align-items-center mb-3"l>rtip' // Ocultamos filtro general porque tenemos el buscador personalizado
+            });
+
+            // Submit Crear Producto
+            $('#frmCrearProducto').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/Productos/CrearProducto',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(res) {
+                        if (res.ok) {
+                            $('#modalCrearProducto').modal('hide');
+                            showAlert(res.msg || 'Producto creado correctamente', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg, 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error en la comunicación con el servidor', 'error');
+                    }
+                });
+            });
+
+            // Submit Editar Producto
+            $('#frmEditarProducto').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/Productos/ActualizarProducto',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(res) {
+                        if (res.ok) {
+                            $('#modalEditarProducto').modal('hide');
+                            showAlert(res.msg || 'Producto actualizado correctamente', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg, 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error en la comunicación con el servidor', 'error');
+                    }
+                });
+            });
+        });
+
+        function editarProducto(id, idCat, idMarc, idProv, sku, nombre, desc, costo, venta, stockMin, estado) {
+            $('#edit_id_producto').val(id);
+            $('#edit_id_categoria').val(idCat);
+            $('#edit_id_marca').val(idMarc);
+            $('#edit_id_proveedor').val(idProv);
+            $('#edit_sku').val(sku);
+            $('#edit_nombre').val(nombre);
+            $('#edit_descripcion').val(desc);
+            $('#edit_precio_costo').val(costo);
+            $('#edit_precio_venta').val(venta);
+            $('#edit_stock_minimo').val(stockMin);
+            $('#edit_estado').val(estado.toString());
+            $('#modalEditarProducto').modal('show');
+        }
+
+        function eliminarProducto(id, nombre) {
+            if (confirm(`¿Está seguro de que desea desactivar el producto "${nombre}"?`)) {
+                $.ajax({
+                    url: '/Productos/EliminarProducto',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function(res) {
+                        if (res.ok) {
+                            showAlert(res.msg || 'Producto desactivado correctamente', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg || 'No se pudo desactivar el producto', 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error al procesar la solicitud', 'error');
+                    }
+                });
+            }
+        }
+    </script>
+}

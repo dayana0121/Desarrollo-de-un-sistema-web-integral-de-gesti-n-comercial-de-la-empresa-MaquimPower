@@ -1,0 +1,253 @@
+﻿@{
+    ViewData["Title"] = "Cotizaciones";
+    var cotizaciones = ViewBag.Cotizaciones as List<E1.Models.Cotizacion> ?? new List<E1.Models.Cotizacion>();
+    var clientes = ViewBag.Clientes as List<E1.Models.Cliente> ?? new List<E1.Models.Cliente>();
+    string estadoFiltro = ViewBag.EstadoFiltro ?? "";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0" style="font-weight:800;color:var(--text-primary);">Ventas</h1>
+            <p class="text-muted mb-0">Gestione ventas, cotizaciones y estados</p>
+        </div>
+    </div>
+
+    <div class="module-tabs">
+        <a href="/Ventas/POS">POS</a>
+        <a href="/Ventas/Historial">Historial</a>
+        <a href="/Ventas/Cotizaciones" class="active">Cotizaciones</a>
+        <a href="/Ventas/Estados">Estados</a>
+    </div>
+
+    <div class="card-module">
+        <div class="card-module-header">
+            <div>
+                <h2>Cotizaciones</h2>
+                <p>Cree y convierta cotizaciones en ventas</p>
+            </div>
+            <button class="btn-primary-mp" onclick="abrirModalCotizar()">
+                <i class="fa-solid fa-plus"></i> Nueva Cotización
+            </button>
+        </div>
+
+        <form method="get" class="row g-3 mb-4 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Buscar</label>
+                <input type="text" name="busqueda" class="form-control" placeholder="N° cotización o cliente..." value="@ViewBag.Busqueda" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Estado</label>
+                <select name="estado" class="form-select" id="sel_estado_cot">
+                    <option value="">Todos</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Convertida">Convertida</option>
+                    <option value="Cancelada">Cancelada</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn-primary-mp w-100">
+                    <i class="fa-solid fa-filter me-1"></i>Filtrar
+                </button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle w-100">
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th class="text-end">Total</th>
+                        <th>Estado</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in cotizaciones)
+                    {
+                        <tr>
+                            <td><code style="color:var(--accent);">@c.numero_cotizacion</code></td>
+                            <td>@c.Cliente?.nombre_completo</td>
+                            <td class="small text-muted">@c.fecha_cotizacion.ToString("dd/MM/yyyy")</td>
+                            <td class="text-end fw-semibold">S/ @c.total.ToString("N2")</td>
+                            <td>
+                                @if (c.estado == "Pendiente")
+                                {
+                                    <span style="background:#f59e0b22;color:#f59e0b;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;">Pendiente</span>
+                                }
+                                else if (c.estado == "Convertida")
+                                {
+                                    <span class="badge-active">Convertida</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-inactive">@c.estado</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                @if (c.estado == "Pendiente")
+                                {
+                                    <a href="/Ventas/POS?id_cotizacion=@c.id_cotizacion" class="action-btn btn-edit">
+                                        <i class="fa-solid fa-cash-register"></i>
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    @if (!cotizaciones.Any())
+                    {
+                        <tr><td colspan="6" class="text-center text-muted py-4">No hay cotizaciones registradas</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nueva Cotización -->
+<div class="modal fade" id="modalCotizar" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-file-invoice text-warning me-2"></i>Nueva Cotización</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-5">
+                        <label class="form-label">Cliente</label>
+                        <select id="cot_cliente" class="form-select">
+                            <option value="">Selecciona cliente...</option>
+                            @foreach (var cl in clientes)
+                            {
+                                <option value="@cl.id_cliente">@cl.nombre_completo</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-7">
+                        <label class="form-label">Observación</label>
+                        <input type="text" id="cot_obs" class="form-control" placeholder="Opcional..." />
+                    </div>
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" id="cot_busq" class="form-control" placeholder="Buscar producto por nombre o SKU..." />
+                            <button class="btn-primary-mp" style="border-radius:0 8px 8px 0;" onclick="buscarProductoCot()">
+                                <i class="fa-solid fa-search"></i>
+                            </button>
+                        </div>
+                        <div id="cot_resultados" class="list-group mt-1 position-absolute" style="z-index:999;width:400px;display:none;"></div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle w-100">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th style="width:90px">Cant.</th>
+                                <th style="width:110px">Precio U.</th>
+                                <th style="width:100px">Desc.</th>
+                                <th style="width:110px" class="text-end">Subtotal</th>
+                                <th style="width:40px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cot_tbody"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="text-end fw-semibold">Total:</td>
+                                <td class="fw-bold" style="color:var(--accent);" id="cot_total">S/ 0.00</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary-mp" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn-primary-mp" onclick="guardarCotizacion()">
+                    <i class="fa-solid fa-save me-1"></i>Guardar Cotización
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('sel_estado_cot').value = '@estadoFiltro';
+
+        let cotItems = [];
+
+        function abrirModalCotizar() {
+            cotItems = [];
+            renderCotTabla();
+            document.getElementById('cot_cliente').value = '';
+            document.getElementById('cot_obs').value = '';
+            document.getElementById('cot_busq').value = '';
+            new bootstrap.Modal(document.getElementById('modalCotizar')).show();
+        }
+
+        async function buscarProductoCot() {
+            const q = document.getElementById('cot_busq').value.trim();
+            if (!q) return;
+            const res = await fetch('/Ventas/BuscarProductos?q=' + encodeURIComponent(q));
+            const lista = await res.json();
+            const div = document.getElementById('cot_resultados');
+            div.innerHTML = '';
+            if (lista.length === 0) { div.style.display = 'none'; return; }
+            lista.forEach(p => {
+                const a = document.createElement('a');
+                a.href = '#';
+                a.className = 'list-group-item list-group-item-action small';
+                a.textContent = p.nombre + ' — S/ ' + p.precio_venta.toFixed(2) + ' (Stock: ' + p.stock_actual + ')';
+                a.onclick = (e) => { e.preventDefault(); agregarProductoCot(p); div.style.display = 'none'; };
+                div.appendChild(a);
+            });
+            div.style.display = 'block';
+        }
+
+        function agregarProductoCot(p) {
+            const existe = cotItems.find(x => x.id_producto === p.id_producto);
+            if (existe) { existe.cantidad++; }
+            else { cotItems.push({ id_producto: p.id_producto, nombre: p.nombre, cantidad: 1, precio_unitario: p.precio_venta, descuento: 0 }); }
+            renderCotTabla();
+        }
+
+        function renderCotTabla() {
+            const tbody = document.getElementById('cot_tbody');
+            tbody.innerHTML = '';
+            let total = 0;
+            cotItems.forEach((item, i) => {
+                const sub = item.cantidad * item.precio_unitario - item.descuento;
+                total += sub;
+                const tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td>' + item.nombre + '</td>' +
+                    '<td><input type="number" class="form-control form-control-sm" min="1" value="' + item.cantidad + '" onchange="cotItems[' + i + '].cantidad=+this.value;renderCotTabla()" /></td>' +
+                    '<td><input type="number" class="form-control form-control-sm" min="0" step="0.01" value="' + item.precio_unitario + '" onchange="cotItems[' + i + '].precio_unitario=+this.value;renderCotTabla()" /></td>' +
+                    '<td><input type="number" class="form-control form-control-sm" min="0" step="0.01" value="' + item.descuento + '" onchange="cotItems[' + i + '].descuento=+this.value;renderCotTabla()" /></td>' +
+                    '<td class="text-end fw-semibold">S/ ' + sub.toFixed(2) + '</td>' +
+                    '<td><button class="action-btn btn-delete" onclick="cotItems.splice(' + i + ',1);renderCotTabla()"><i class="fa-solid fa-times"></i></button></td>';
+                tbody.appendChild(tr);
+            });
+            document.getElementById('cot_total').textContent = 'S/ ' + total.toFixed(2);
+        }
+
+        async function guardarCotizacion() {
+            const id_cliente = parseInt(document.getElementById('cot_cliente').value);
+            if (!id_cliente) { showAlert('Selecciona un cliente', 'error'); return; }
+            if (cotItems.length === 0) { showAlert('Agrega al menos un producto', 'error'); return; }
+            const res = await fetch('/Ventas/CrearCotizacion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_cliente, observacion: document.getElementById('cot_obs').value, productos: cotItems })
+            });
+            const data = await res.json();
+            if (data.ok) { showAlert(data.msg + (data.numero ? ' — ' + data.numero : ''), 'success'); setTimeout(() => location.reload(), 800); }
+            else showAlert(data.msg, 'error');
+        }
+    </script>
+}

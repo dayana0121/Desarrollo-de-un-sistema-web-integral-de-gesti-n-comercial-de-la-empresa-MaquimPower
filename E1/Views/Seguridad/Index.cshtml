@@ -1,0 +1,226 @@
+@{
+    ViewData["Title"] = "Gestión de Roles";
+    var roles = ViewBag.Roles as List<E1.Models.Rol> ?? new List<E1.Models.Rol>();
+}
+
+<div class="terceros-page">
+    <div class="terceros-header">
+        <h1>Seguridad</h1>
+        <p>Gestione accesos, roles, permisos y usuarios del sistema</p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="terceros-tabs">
+        <a href="/Seguridad" class="tab active"><i class="fa-solid fa-user-shield"></i> Roles</a>
+        <a href="/Seguridad/Permisos" class="tab"><i class="fa-solid fa-key"></i> Permisos</a>
+        <a href="/Seguridad/AccesosPorRol" class="tab"><i class="fa-solid fa-universal-access"></i> Accesos por Rol</a>
+        <a href="/Seguridad/Usuarios" class="tab"><i class="fa-solid fa-users-gear"></i> Usuarios</a>
+    </div>
+
+    <!-- Card Module -->
+    <div class="terceros-card">
+        <div class="card-module-header">
+            <div>
+                <h2>Roles del Sistema</h2>
+                <p>Configure los roles que se asignarán a los usuarios</p>
+            </div>
+            <button class="btn-primary-mp" data-bs-toggle="modal" data-bs-target="#modalCrearRol">
+                <i class="fa-solid fa-plus"></i> Nuevo Rol
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table id="tblRoles" class="table table-hover align-middle w-100">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">ID</th>
+                        <th>Nombre</th>
+                        <th>Es de Sistema</th>
+                        <th>Estado</th>
+                        <th style="width: 120px;" class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in roles)
+                    {
+                        <tr>
+                            <td>@r.id_rol</td>
+                            <td>@r.nombre</td>
+                            <td>
+                                @if (r.es_sistema)
+                                {
+                                    <span class="badge" style="background-color: rgba(249, 115, 22, 0.15); color: var(--accent);">Sí</span>
+                                }
+                                else
+                                {
+                                    <span class="badge" style="background-color: rgba(120, 113, 108, 0.15); color: var(--text-secondary);">No</span>
+                                }
+                            </td>
+                            <td>
+                                @if (r.estado)
+                                {
+                                    <span class="badge-active">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-inactive">Inactivo</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                @if (!r.es_sistema)
+                                {
+                                    <button class="action-btn btn-edit me-1" onclick="editarRol(@r.id_rol, '@r.nombre', @(r.estado ? "true" : "false"))">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+                                    <button class="action-btn btn-delete" onclick="eliminarRol(@r.id_rol, '@r.nombre')">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Protegido</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Crear Rol -->
+<div class="modal fade" id="modalCrearRol" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-shield-halved text-warning me-2"></i> Crear Nuevo Rol</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="frmCrearRol">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Rol</label>
+                        <input type="text" name="nombre" class="form-control-custom w-100" placeholder="Ej. Cajero" required maxlength="50" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary-mp" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-primary-mp">Crear Rol</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Rol -->
+<div class="modal fade" id="modalEditarRol" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-pen text-warning me-2"></i> Editar Rol</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="frmEditarRol">
+                <input type="hidden" name="id_rol" id="edit_id_rol" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Rol</label>
+                        <input type="text" name="nombre" id="edit_nombre" class="form-control-custom w-100" required maxlength="50" autocomplete="off" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Estado</label>
+                        <select name="estado" id="edit_estado" class="form-select w-100">
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary-mp" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-primary-mp">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#tblRoles').DataTable();
+
+            // Submit Crear Rol
+            $('#frmCrearRol').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/Seguridad/CrearRol',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(res) {
+                        if (res.ok) {
+                            $('#modalCrearRol').modal('hide');
+                            showAlert(res.msg, 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg, 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error en la comunicación con el servidor', 'error');
+                    }
+                });
+            });
+
+            // Submit Editar Rol
+            $('#frmEditarRol').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/Seguridad/ActualizarRol',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(res) {
+                        if (res.ok) {
+                            $('#modalEditarRol').modal('hide');
+                            showAlert(res.msg, 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg, 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error en la comunicación con el servidor', 'error');
+                    }
+                });
+            });
+        });
+
+        function editarRol(id, nombre, estado) {
+            $('#edit_id_rol').val(id);
+            $('#edit_nombre').val(nombre);
+            $('#edit_estado').val(estado.toString());
+            $('#modalEditarRol').modal('show');
+        }
+
+        function eliminarRol(id, nombre) {
+            if (confirm(`¿Está seguro de que desea eliminar el rol "${nombre}"?`)) {
+                $.ajax({
+                    url: '/Seguridad/EliminarRol',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function(res) {
+                        if (res.ok) {
+                            showAlert(res.msg || 'Rol eliminado correctamente', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg || 'No se pudo eliminar el rol', 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error al procesar la solicitud', 'error');
+                    }
+                });
+            }
+        }
+    </script>
+}

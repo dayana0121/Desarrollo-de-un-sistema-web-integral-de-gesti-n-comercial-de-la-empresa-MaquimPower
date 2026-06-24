@@ -1,0 +1,175 @@
+@model E1.Models.Dashboard
+@{
+    ViewData["Title"] = "Dashboard Principal";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0" style="font-weight: 800; color: var(--text-primary);">Dashboard</h1>
+            <p class="text-muted mb-0">Resumen y estado de las operaciones de MaquimPower</p>
+        </div>
+        <div class="text-muted small">
+            <i class="fa-regular fa-calendar-days me-1"></i> @DateTime.Now.ToString("dd MMMM yyyy, HH:mm")
+        </div>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="row g-3 mb-4">
+        <!-- KPI Ventas Hoy -->
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="kpi-card d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="kpi-label">Ventas de Hoy</div>
+                    <div class="kpi-value">S/ @Model.VentasHoy.ToString("N2")</div>
+                </div>
+                <div class="kpi-icon" style="background: rgba(249, 115, 22, 0.12); color: var(--accent);">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Productos -->
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="kpi-card d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="kpi-label">Total Productos</div>
+                    <div class="kpi-value">@Model.TotalProductos</div>
+                </div>
+                <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Clientes -->
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="kpi-card d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="kpi-label">Clientes Activos</div>
+                    <div class="kpi-value">@Model.TotalClientes</div>
+                </div>
+                <div class="kpi-icon" style="background: rgba(14, 165, 233, 0.12); color: #0ea5e9;">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Stock Crítico -->
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="kpi-card d-flex align-items-center justify-content-between @(Model.StockCritico > 0 ? "border border-danger border-opacity-50" : "")">
+                <div>
+                    <div class="kpi-label">Stock Crítico</div>
+                    <div class="kpi-value @(Model.StockCritico > 0 ? "text-danger" : "")">@Model.StockCritico</div>
+                </div>
+                <div class="kpi-icon" style="background: @(Model.StockCritico > 0 ? "rgba(239, 68, 68, 0.12)" : "rgba(120, 113, 108, 0.12)"); color: @(Model.StockCritico > 0 ? "#ef4444" : "var(--text-secondary)");">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="row g-4">
+        <!-- Monthly Sales Table -->
+        <div class="col-12 col-lg-7">
+            <div class="card-module h-100">
+                <div class="card-module-header">
+                    <div>
+                        <h2>Ventas Mensuales</h2>
+                        <p>Historial acumulado de ventas facturadas por mes</p>
+                    </div>
+                </div>
+                
+                @if (Model.VentasMensuales != null && Model.VentasMensuales.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Mes</th>
+                                    <th class="text-end">Nro Ventas</th>
+                                    <th class="text-end">Total Facturado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var vm in Model.VentasMensuales)
+                                {
+                                    <tr>
+                                        <td>
+                                            <i class="fa-regular fa-calendar text-warning me-2"></i>
+                                            @vm.mes
+                                        </td>
+                                        <td class="text-end">@vm.cantidad_ventas</td>
+                                        <td class="text-end" style="color: var(--accent); font-weight: 600;">
+                                            S/ @vm.total_ventas.ToString("N2")
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-chart-line fa-3x mb-3 text-opacity-25"></i>
+                        <p>No se registran ventas mensuales acumuladas en el sistema.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Top Products List -->
+        <div class="col-12 col-lg-5">
+            <div class="card-module h-100">
+                <div class="card-module-header">
+                    <div>
+                        <h2>Productos Más Vendidos</h2>
+                        <p>Top de productos con mayor número de salidas</p>
+                    </div>
+                </div>
+
+                @if (Model.TopProductos != null && Model.TopProductos.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th class="text-end">Cant. Vendida</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var tp in Model.TopProductos)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fa-solid fa-star text-warning me-2"></i>
+                                                <span class="text-truncate" style="max-width: 240px;">@tp.nombre_producto</span>
+                                            </div>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="badge" style="background-color: rgba(249, 115, 22, 0.15); color: var(--accent); font-size: 13px;">
+                                                @tp.total_vendido uds
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-boxes-packing fa-3x mb-3 text-opacity-25"></i>
+                        <p>No se registran productos vendidos en el sistema.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

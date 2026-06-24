@@ -1,0 +1,43 @@
+@model E1.Models.Login
+@{
+    ViewData["Title"] = "Iniciar Sesión";
+}
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <div class="login-header">
+            <h2>Iniciar sesión</h2>
+            <p>Accede al panel administrativo.</p>
+        </div>
+        
+        <form asp-action="Index" method="post" id="loginForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="form-group-custom">
+                <label asp-for="username">Usuario</label>
+                <div class="input-icon-wrapper">
+                    <i class="fa-solid fa-user input-icon"></i>
+                    <input asp-for="username" class="form-control-custom" placeholder="User" autocomplete="off" />
+                </div>
+                <span asp-validation-for="username" class="text-danger small"></span>
+            </div>
+
+            <div class="form-group-custom">
+                <label asp-for="password">Contraseña</label>
+                <div class="input-icon-wrapper">
+                    <i class="fa-solid fa-lock input-icon"></i>
+                    <input asp-for="password" type="password" class="form-control-custom" placeholder="••••••••" />
+                </div>
+                <span asp-validation-for="password" class="text-danger small"></span>
+            </div>
+
+            <button type="submit" class="btn-login-submit">
+                <i class="fa-solid fa-right-to-bracket"></i> Iniciar sesión
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

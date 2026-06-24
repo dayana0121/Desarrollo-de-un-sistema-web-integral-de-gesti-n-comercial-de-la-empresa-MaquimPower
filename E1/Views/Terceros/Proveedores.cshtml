@@ -1,0 +1,190 @@
+@{
+    ViewData["Title"] = "Proveedores";
+}
+
+<div class="terceros-page">
+
+    <div class="terceros-header">
+        <h1>Terceros</h1>
+        <p>Gestione sus clientes y proveedores</p>
+    </div>
+
+    <div class="terceros-info" style="margin-top: 0; margin-bottom: 24px;">
+        <div class="info-icon">
+            <i class="fa-solid fa-circle-info"></i>
+        </div>
+
+        <div>
+            <h3>Información</h3>
+            <p>Los clientes son las personas o empresas que compran sus productos o servicios.</p>
+            <p>Los proveedores son las empresas que le venden mercadería o servicios.</p>
+        </div>
+    </div>
+
+    <div class="terceros-tabs">
+        <a href="/Terceros/Clientes" class="tab">
+            <i class="fa-solid fa-users"></i> Clientes
+        </a>
+
+        <a href="/Terceros/Proveedores" class="tab active">
+            <i class="fa-solid fa-truck-field"></i> Proveedores
+        </a>
+    </div>
+
+    <div class="terceros-card">
+
+        <div class="card-top">
+            <div>
+                <h2>Lista de Proveedores</h2>
+                <p>Administre empresas que venden mercadería o servicios</p>
+            </div>
+
+            <button type="button" class="btn-orange" onclick="abrirModalNuevoProveedor()">
+                <i class="fa-solid fa-plus"></i>
+                Nuevo Proveedor
+            </button>
+        </div>
+
+        <div class="filters proveedores-filters">
+            <div>
+                <label>Buscar por RUC o Razón Social</label>
+                <input id="buscarProveedor" placeholder="Ej. 20606853182 / Comercial..." />
+            </div>
+
+            <div>
+                <label>Estado</label>
+                <select id="filtroEstadoProveedor">
+                    <option value="">-- Todos --</option>
+                    <option value="Activo" selected>Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn-orange" onclick="filtrarProveedores()">
+                <i class="fa-solid fa-filter"></i> Filtrar
+            </button>
+
+            <button type="button" class="btn-reset" onclick="limpiarFiltrosProveedores()">
+                <i class="fa-solid fa-rotate-right"></i>
+            </button>
+        </div>
+
+        <table id="tblProveedores" class="display terceros-table" style="width:100%">
+            <thead>
+                <tr>
+                    <th>RUC</th>
+                    <th>RAZÓN SOCIAL</th>
+                    <th>CONTACTO</th>
+                    <th>TELÉFONO</th>
+                    <th>EMAIL</th>
+                    <th>DIRECCIÓN</th>
+                    <th>ESTADO</th>
+                    <th>ACCIONES</th>
+                </tr>
+            </thead>
+        </table>
+
+    </div>
+</div>
+
+<div class="modal fade" id="modalProveedor" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-mp">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloModalProveedor">Nuevo Proveedor</h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <form id="formProveedor" method="post">
+                <div class="modal-body">
+
+                    <input type="hidden" id="id_proveedor" name="id_proveedor" value="0" />
+
+                    <div class="mb-3">
+                        <label>RUC</label>
+                        <input id="ruc"
+                               name="ruc"
+                               type="text"
+                               inputmode="numeric"
+                               class="form-control input-mp"
+                               maxlength="11"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Razón Social</label>
+                        <input id="razon_social"
+                               name="razon_social"
+                               class="form-control input-mp"
+                               maxlength="150"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Nombre Contacto</label>
+                        <input id="nombre_contacto"
+                               name="nombre_contacto"
+                               class="form-control input-mp"
+                               maxlength="100" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Teléfono</label>
+                        <input id="telefono_proveedor"
+                               name="telefono"
+                               type="text"
+                               inputmode="numeric"
+                               class="form-control input-mp"
+                               maxlength="9" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input id="email_proveedor"
+                               name="email"
+                               type="email"
+                               class="form-control input-mp"
+                               maxlength="100" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Dirección</label>
+                        <input id="direccion_proveedor"
+                               name="direccion"
+                               class="form-control input-mp"
+                               maxlength="200" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Estado</label>
+                        <select id="estado_proveedor"
+                                name="estado"
+                                class="form-control input-mp">
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn-reset"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn-orange">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

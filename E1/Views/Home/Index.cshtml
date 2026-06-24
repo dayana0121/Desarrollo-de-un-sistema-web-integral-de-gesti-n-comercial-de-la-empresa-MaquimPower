@@ -1,0 +1,200 @@
+@model E1.Models.Empresa
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/homepage.css" asp-append-version="true" />
+}
+
+<div class="landing-wrapper">
+    <!-- Navbar -->
+    <nav class="landing-navbar">
+        <a href="/" class="landing-logo">
+            <i class="fa-solid fa-bolt"></i>
+            <span>MAQUIM<span style="color: var(--accent) !important;">POWER</span></span>
+        </a>
+        <ul class="landing-nav-links">
+            <li><a href="#nosotros">Nosotros</a></li>
+            <li><a href="#valores">Valores</a></li>
+            <li><a href="#contacto">Contacto</a></li>
+        </ul>
+        <a href="/Login" class="landing-btn-login">
+            <i class="fa-solid fa-right-from-bracket"></i> Ingresar al ERP
+        </a>
+    </nav>
+
+    <!-- Brown Banner (Hero) -->
+    <header class="landing-banner" id="inicio">
+        <h1 class="banner-title-main">MAQUIM</h1>
+        <h1 class="banner-title-accent">POWER</h1>
+        <p class="banner-subtitle">Maquinaria profesional con potencia peruana.</p>
+    </header>
+
+    <!-- Quiénes Somos -->
+    <section class="landing-about" id="nosotros">
+        <div class="landing-about-row">
+            <div class="landing-about-content">
+                <h2 class="about-title">QUIÉNES <span>SOMOS</span></h2>
+                <p class="about-text">
+                    En Maquimpower, somos una empresa peruana especializada en la venta de maquinaria y equipos profesionales para lavado de autos y limpieza industrial. Desde nuestros inicios, nos hemos comprometido a ofrecer soluciones integrales que combinan tecnología, durabilidad y eficiencia para cubrir las necesidades de talleres, centros CarWash, negocios de limpieza y empresas en todo el país.
+                </p>
+                <p class="about-text">
+                    Contamos con un portafolio de productos que incluye hidrolavadoras de alta presión, aspiradoras industriales, shampoooneras, compresores, generadores, repuestos y más, todos seleccionados bajo rigurosos estándares de calidad. Nuestro enfoque técnico y nuestra atención personalizada nos han permitido consolidarnos como un referente confiable en el sector.
+                </p>
+                <p class="about-text">
+                    Brindamos asesoría especializada antes y después de la venta, asegurando que cada cliente obtenga la mejor solución según su tipo de operación. En Maquimpower, la eficiencia, el servicio y la confianza son pilares de nuestro trabajo diario.
+                </p>
+            </div>
+            <div class="landing-about-media">
+                <div class="logo-card">
+                    @if (!string.IsNullOrEmpty(Model?.logo_url))
+                    {
+                        <img src="@Model.logo_url" alt="Logo de la empresa" class="about-logo-img" />
+                    }
+                    else
+                    {
+                        <div class="default-logo-placeholder">
+                            <div class="mp-symbol">M⚡P</div>
+                            <div class="mp-text">
+                                <span class="white-text">MAQUIM</span>
+                                <span class="orange-text">POWER</span>
+                            </div>
+                        </div>
+                    }
+                    <div class="satisfied-clients-badge">
+                        <span class="badge-number">+1000</span>
+                        <span class="badge-text">Clientes Satisfechos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Visión y Misión -->
+    <section class="landing-vision-mision">
+        <div class="vision-mision-grid">
+            <div class="vision-card">
+                <h3>VISIÓN</h3>
+                <p>
+                    Ser reconocidos como la empresa líder en Perú en la distribución de maquinaria profesional para limpieza y lavado de autos, impulsando la transformación del sector mediante soluciones tecnológicas, sostenibles y altamente eficientes que mejoren la productividad de nuestros clientes.
+                </p>
+            </div>
+            <div class="mision-card">
+                <i class="fa-solid fa-rocket mision-rocket"></i>
+                <h3>MISIÓN</h3>
+                <p>
+                    En Maquimpower, trabajamos para proveer soluciones de limpieza profesional que optimicen el rendimiento y los resultados de nuestros clientes. Ofrecemos equipos de última tecnología, atención personalizada y un servicio postventa eficiente, ayudando a talleres, empresas y centros de lavado a lograr una limpieza impecable, segura y sostenible.
+                </p>
+                <p>
+                    Nos comprometemos a ser aliados estratégicos de cada negocio, aportando no solo productos de calidad, sino también confianza, asesoría y soporte técnico especializado.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nuestros Valores -->
+    <section class="landing-valores" id="valores">
+        <h3 class="valores-title">NUESTROS VALORES</h3>
+        <div class="valores-grid">
+            <!-- Compromiso -->
+            <div class="valor-card">
+                <div class="valor-icon-wrapper">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h4>Compromiso</h4>
+                <p>Nos dedicamos a cumplir con responsabilidad cada promesa hecha a nuestros clientes y aliados.</p>
+            </div>
+            <!-- Honestidad -->
+            <div class="valor-card">
+                <div class="valor-icon-wrapper">
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+                <h4>Honestidad</h4>
+                <p>Trabajamos con transparencia en cada venta, recomendación y servicio que brindamos.</p>
+            </div>
+            <!-- Innovación -->
+            <div class="valor-card">
+                <div class="valor-icon-wrapper">
+                    <i class="fa-solid fa-microchip"></i>
+                </div>
+                <h4>Innovación</h4>
+                <p>Apostamos por la mejora continua, incorporando equipos modernos y soluciones adaptadas a las nuevas exigencias.</p>
+            </div>
+            <!-- Excelencia -->
+            <div class="valor-card">
+                <div class="valor-icon-wrapper">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+                <h4>Excelencia</h4>
+                <p>Buscamos siempre superar las expectativas a través de productos confiables y atención de calidad.</p>
+            </div>
+            <!-- Servicio al cliente -->
+            <div class="valor-card">
+                <div class="valor-icon-wrapper">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <h4>Servicio al cliente</h4>
+                <p>Cada cliente es una prioridad. Escuchamos sus necesidades y ofrecemos soluciones efectivas y personalizadas.</p>
+            </div>
+            <!-- Sostenibilidad -->
+            <div class="valor-card">
+                <div class="valor-icon-wrapper">
+                    <i class="fa-solid fa-leaf"></i>
+                </div>
+                <h4>Sostenibilidad</h4>
+                <p>Promovemos el uso responsable de recursos y tecnologías que minimicen el impacto ambiental.</p>
+            </div>
+            <!-- Trabajo en equipo -->
+            <div class="valor-card">
+                <div class="valor-icon-wrapper">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <h4>Trabajo en equipo</h4>
+                <p>Fomentamos un ambiente de colaboración dentro y fuera de la empresa para lograr objetivos comunes.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer / Contacto -->
+    <footer class="landing-footer" id="contacto">
+        <div class="landing-footer-orange-bar"></div>
+        <div class="landing-footer-content">
+            <!-- Columna Logo e Info de Contacto -->
+            <div class="landing-footer-info">
+                <div class="footer-logo">
+                    <span class="footer-logo-white">MAQUIM</span><span class="footer-logo-orange">POWER</span>
+                </div>
+                <p>
+                    <i class="fa-solid fa-location-dot footer-icon-orange"></i> 
+                    <span>@(Model?.direccion ?? "Av. Guanábana 112, Los Olivos, Lima") <br/><small>(Atención previa cita)</small></span>
+                </p>
+                <p>
+                    <i class="fa-brands fa-whatsapp footer-icon-green"></i> 
+                    <span>@(Model?.telefono ?? "999999999")</span>
+                </p>
+                <p>
+                    <i class="fa-solid fa-envelope footer-icon-orange"></i> 
+                    <span>@(Model?.email ?? "contacto@maquimpower.com")</span>
+                </p>
+            </div>
+
+            <!-- Columna Datos Legales -->
+            <div class="landing-footer-column">
+                <h4>Datos Legales</h4>
+                <p style="color: #94a3b8; font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-id-card footer-icon-orange"></i> 
+                    <span>RUC: @(Model?.ruc ?? "20606853182")</span>
+                </p>
+                <p style="color: #94a3b8; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-circle-info footer-icon-orange"></i> 
+                    <span>Sistema: ERP de Última Generación</span>
+                </p>
+            </div>
+        </div>
+        <div class="landing-footer-bottom">
+            &copy; @DateTime.Now.Year @(Model?.nombre ?? "MaquimPower"). Todos los derechos reservados.
+        </div>
+    </footer>
+</div>
+

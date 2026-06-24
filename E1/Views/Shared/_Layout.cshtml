@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MaquimPower</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <!-- Estilos del sistema -->
+    <link rel="stylesheet" href="~/css/site.css" />
+
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+@{
+    bool showLayout = Context.Session.GetInt32("IdUsuario").HasValue
+                      && ViewContext.RouteData.Values["controller"]?.ToString() != "Home"
+                      && ViewContext.RouteData.Values["controller"]?.ToString() != "Login";
+
+    // Verificador rápido de acceso para el sidebar (inline lambda)
+    Func<string, string, bool> canSee = (modulo, submodulo) =>
+    {
+        if (!showLayout) return false;
+        var cfg = (IConfiguration)ViewContext.HttpContext.RequestServices.GetService(typeof(IConfiguration))!;
+        return E1.Helpers.AccessHelper.TieneAcceso(Context.Session, cfg, modulo, submodulo);
+    };
+
+    string ctrl = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+}
+
+    <!-- ── SIDEBAR ── -->
+    @if (showLayout)
+    {
+        <nav id="sidebar">
+            <a href="/" class="sidebar-brand">
+                <div class="brand-icon"><i class="fa-solid fa-bolt"></i></div>
+                <div class="brand-text">
+                    <div class="name">MaquimPower</div>
+                    <div class="sub">Sistema ERP</div>
+                </div>
+            </a>
+
+            <div class="sidebar-nav">
+
+                <div class="nav-section-label">Principal</div>
+
+                @if (canSee("Dashboard", "Dashboard"))
+                {
+                    <div class="nav-item">
+                        <a href="/Dashboard" class="@(ctrl == "Dashboard" ? "active" : "")">
+                            <i class="fa-solid fa-gauge-high"></i> Dashboard
+                        </a>
+                    </div>
+                }
+
+                @if (canSee("Configuracion", "Configuracion"))
+                {
+                    <div class="nav-item">
+                        <a href="/Configuracion" class="@(ctrl == "Configuracion" ? "active" : "")">
+                            <i class="fa-solid fa-gear"></i> Configuración
+                        </a>
+                    </div>
+                }
+
+                @{
+                    bool showOpSection = canSee("Terceros", "Clientes") || canSee("Terceros", "Proveedores")
+                        || canSee("Productos", "Productos") || canSee("Compras", "Compras")
+                        || canSee("Inventario", "Almacenes") || canSee("Caja", "Caja") || canSee("Ventas", "Ventas");
+                }
+                @if (showOpSection)
+                {
+                    <div class="nav-section-label">Operaciones</div>
+                }
+
+                @if (canSee("Terceros", "Clientes") || canSee("Terceros", "Proveedores"))
+                {
+                    <div class="nav-item">
+                        <a href="/Terceros/Clientes" class="@(ctrl == "Terceros" ? "active" : "")">
+                            <i class="fa-solid fa-users"></i> Terceros
+                        </a>
+                    </div>
+                }
+
+                @if (canSee("Productos", "Productos"))
+                {
+                    <div class="nav-item">
+                        <a href="/Productos" class="@(ctrl == "Productos" ? "active" : "")">
+                            <i class="fa-solid fa-box"></i> Productos
+                        </a>
+                    </div>
+                }
+
+                @if (canSee("Compras", "Compras"))
+                {
+                    <div class="nav-item">
+                        <a href="/Compras" class="@(ctrl == "Compras" ? "active" : "")">
+                            <i class="fa-solid fa-cart-arrow-down"></i> Compras
+                        </a>
+                    </div>
+                }
+
+                @if (canSee("Inventario", "Almacenes"))
+                {
+                    <div class="nav-item">
+                        <a href="/Inventario" class="@(ctrl == "Inventario" ? "active" : "")">
+                            <i class="fa-solid fa-warehouse"></i> Inventario
+                        </a>
+                    </div>
+                }
+
+                @if (canSee("Caja", "Caja"))
+                {
+                    <div class="nav-item">
+                        <a href="/Caja" class="@(ctrl == "Caja" ? "active" : "")">
+                            <i class="fa-solid fa-cash-register"></i> Caja
+                        </a>
+                    </div>
+                }
+
+                @if (canSee("Ventas", "Ventas"))
+                {
+                    <div class="nav-item">
+                        <a href="/Ventas" class="@(ctrl == "Ventas" ? "active" : "")">
+                            <i class="fa-solid fa-chart-line"></i> Ventas
+                        </a>
+                    </div>
+                }
+
+                @{
+                    bool showAdminSection = canSee("Seguridad", "Roles") || canSee("Seguridad", "Permisos")
+                        || canSee("Seguridad", "Accesos") || canSee("Seguridad", "Usuarios");
+                }
+                @if (showAdminSection)
+                {
+                    <div class="nav-section-label">Administración</div>
+                    <div class="nav-item">
+                        <a href="/Seguridad" class="@(ctrl == "Seguridad" ? "active" : "")">
+                            <i class="fa-solid fa-shield-halved"></i> Seguridad
+                        </a>
+                    </div>
+                }
+
+            </div>
+
+            <div class="sidebar-footer">
+                <a href="/Login/Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+                </a>
+            </div>
+        </nav>
+    }
+
+    <!-- ── TOPBAR ── -->
+    @if (showLayout)
+    {
+        <div id="topbar">
+            <span class="topbar-title">@ViewData["Title"]</span>
+            <div class="topbar-right">
+                <a href="/Dashboard" class="topbar-btn-back">
+                    <i class="fa-solid fa-arrow-left"></i> Volver al dashboard
+                </a>
+                <div class="topbar-user">
+                    <div class="topbar-avatar">
+                        @(Context.Session.GetString("Nombre")?.Substring(0, 1).ToUpper() ?? "U")
+                    </div>
+                    <div class="topbar-user-info">
+                        <div class="u-name">@Context.Session.GetString("Nombre")</div>
+                        <div class="u-role">@Context.Session.GetString("NombreRol")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ── CONTENIDO PRINCIPAL ── -->
+    <div id="main-content" class="@(showLayout ? "" : "no-layout")">
+        @RenderBody()
+    </div>
+
+    <!-- ── CONTENEDOR DE ALERTAS ── -->
+    <div id="alert-container"></div>
+
+    <!-- ── SCRIPTS ── -->
+  
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="~/js/site.js"></script>
+    <script>
+        // Alerta flotante global
+        function showAlert(msg, type = 'success') {
+            const icon = type === 'success'
+                ? '<i class="fa-solid fa-circle-check" style="color:#10b981"></i>'
+                : '<i class="fa-solid fa-circle-xmark" style="color:#ef4444"></i>';
+            const el = $(`<div class="alert-mp ${type}">${icon} ${msg}</div>`);
+            $('#alert-container').append(el);
+            setTimeout(() => el.fadeOut(300, () => el.remove()), 3500);
+        }
+
+        // DataTables en español por defecto
+        $.extend(true, $.fn.dataTable.defaults, {
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+            },
+            pageLength: 10,
+            lengthMenu: [10, 25, 50],
+            dom: '<"d-flex justify-content-between align-items-center mb-3"l>rtip'
+        });
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,96 @@
+﻿@{
+    ViewData["Title"] = "Terceros";
+}
+
+<div class="terceros-page">
+    <div class="terceros-header">
+        <h1>Terceros</h1>
+        <p>Gestione sus clientes y proveedores</p>
+    </div>
+
+    <div class="terceros-tabs">
+        <button class="tab active">👥 Clientes</button>
+        <button class="tab">🚚 Proveedores</button>
+    </div>
+
+    <div class="terceros-card">
+        <div class="card-top">
+            <div>
+                <h2>Lista de Clientes</h2>
+                <p>Administre personas naturales, empresas y consumidores finales</p>
+            </div>
+
+            <button class="btn-orange">+ Nuevo Cliente</button>
+        </div>
+
+        <div class="filters">
+            <div>
+                <label>Buscar por DNI, RUC o Nombre</label>
+                <input placeholder="Ej. 74581236 / Juan Pérez..." />
+            </div>
+
+            <div>
+                <label>Tipo Documento</label>
+                <select>
+                    <option>-- Todos --</option>
+                    <option>DNI</option>
+                    <option>RUC</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Estado</label>
+                <select>
+                    <option>-- Todos --</option>
+                    <option>Activo</option>
+                    <option>Inactivo</option>
+                </select>
+            </div>
+
+            <button class="btn-orange">Filtrar</button>
+            <button class="btn-reset">↻</button>
+        </div>
+
+        <table class="terceros-table">
+            <thead>
+                <tr>
+                    <th>DOCUMENTO</th>
+                    <th>NOMBRE / RAZÓN SOCIAL</th>
+                    <th>TELÉFONO</th>
+                    <th>EMAIL</th>
+                    <th>DIRECCIÓN</th>
+                    <th>ESTADO</th>
+                    <th>ACCIONES</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>DNI - 74581236</td>
+                    <td>Juan Pérez López</td>
+                    <td>987654321</td>
+                    <td>juan@gmail.com</td>
+                    <td>Lima, Perú</td>
+                    <td><span class="badge active">Activo</span></td>
+                    <td>
+                        <button class="btn-edit">✎</button>
+                        <button class="btn-delete">🗑</button>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>RUC - 20606853182</td>
+                    <td>Comercial San Pedro SAC</td>
+                    <td>999888777</td>
+                    <td>ventas@sanpedro.com</td>
+                    <td>Los Olivos</td>
+                    <td><span class="badge active">Activo</span></td>
+                    <td>
+                        <button class="btn-edit">✎</button>
+                        <button class="btn-delete">🗑</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,120 @@
+﻿@{
+    ViewData["Title"] = "Historial de Ventas";
+    var ventas = ViewBag.Ventas as List<E1.Models.Venta> ?? new List<E1.Models.Venta>();
+    var estados = ViewBag.Estados as List<E1.Models.EstadoVenta> ?? new List<E1.Models.EstadoVenta>();
+    int? idEstadoFiltro = ViewBag.IdEstado as int?;
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0" style="font-weight:800;color:var(--text-primary);">Ventas</h1>
+            <p class="text-muted mb-0">Gestione ventas, cotizaciones y estados</p>
+        </div>
+    </div>
+
+    <div class="module-tabs">
+        <a href="/Ventas/POS">POS</a>
+        <a href="/Ventas/Historial" class="active">Historial</a>
+        <a href="/Ventas/Cotizaciones">Cotizaciones</a>
+        <a href="/Ventas/Estados">Estados</a>
+    </div>
+
+    <div class="card-module">
+        <div class="card-module-header">
+            <div>
+                <h2>Historial de Ventas</h2>
+                <p>Consulte, filtre y anule ventas registradas</p>
+            </div>
+        </div>
+
+        <form method="get" class="row g-3 mb-4 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Buscar</label>
+                <input type="text" name="busqueda" class="form-control" placeholder="N° venta o cliente..." value="@ViewBag.Busqueda" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Estado</label>
+                <select name="id_estado" class="form-select" id="sel_estado_hist">
+                    <option value="">Todos</option>
+                    @foreach (var e in estados)
+                    {
+                        <option value="@e.id_estado_venta">@e.nombre</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Desde</label>
+                <input type="date" name="fecha_desde" class="form-control" value="@ViewBag.FechaDesde" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Hasta</label>
+                <input type="date" name="fecha_hasta" class="form-control" value="@ViewBag.FechaHasta" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn-primary-mp w-100">
+                    <i class="fa-solid fa-filter me-1"></i>Filtrar
+                </button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle w-100">
+                <thead>
+                    <tr>
+                        <th>N° Venta</th>
+                        <th>Cliente</th>
+                        <th>Comprobante</th>
+                        <th>Método Pago</th>
+                        <th class="text-end">Total</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in ventas)
+                    {
+                        <tr>
+                            <td><code style="color:var(--accent);">@v.numero_venta</code></td>
+                            <td>@v.Cliente?.nombre_completo</td>
+                            <td><span class="small text-muted">@v.tipo_comprobante</span></td>
+                            <td>@v.metodo_pago</td>
+                            <td class="text-end fw-semibold" style="color:#22c55e;">S/ @v.total.ToString("N2")</td>
+                            <td>
+                                @if (v.EstadoVenta?.codigo == "ANUL")
+                                {
+                                    <span class="badge-inactive">Anulada</span>
+                                }
+                                else if (v.EstadoVenta?.codigo == "COMP")
+                                {
+                                    <span class="badge-active">@v.EstadoVenta?.nombre</span>
+                                }
+                                else
+                                {
+                                    <span style="background:#f59e0b22;color:#f59e0b;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;">@v.EstadoVenta?.nombre</span>
+                                }
+                            </td>
+                            <td class="small text-muted">@v.fecha_venta.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="text-end">
+                                <a href="/Ventas/Detalle/@v.id_venta" class="action-btn btn-edit">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!ventas.Any())
+                    {
+                        <tr><td colspan="8" class="text-center text-muted py-4">No hay ventas registradas</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('sel_estado_hist').value = '@(idEstadoFiltro?.ToString() ?? "")';
+    </script>
+}

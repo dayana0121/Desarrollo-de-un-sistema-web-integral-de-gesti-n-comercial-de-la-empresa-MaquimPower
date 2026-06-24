@@ -1,0 +1,159 @@
+@{
+    ViewData["Title"] = "Accesos por Rol";
+    var roles = ViewBag.Roles as List<E1.Models.Rol> ?? new List<E1.Models.Rol>();
+    var accesos = ViewBag.Accesos as List<E1.Models.AccesoPorRol> ?? new List<E1.Models.AccesoPorRol>();
+    int? idRolSel = ViewBag.IdRolSel as int?;
+
+    // Definición estática de módulos y submódulos en el ERP
+    var itemsMatriz = new List<(string Modulo, string Submodulo, string Descripcion)>
+    {
+        ("Dashboard", "Dashboard", "Ver resumen de métricas y estadísticas"),
+        ("Configuracion", "Configuracion", "Modificar datos generales de la empresa"),
+        ("Terceros", "Clientes", "Ver, crear y editar clientes (DNI/RUC)"),
+        ("Terceros", "Proveedores", "Ver, crear y editar proveedores (RUC)"),
+        ("Productos", "Productos", "Gestionar catálogo de categorías, marcas y productos"),
+        ("Compras", "Compras", "Registrar y recepcionar órdenes de compra a proveedores"),
+        ("Inventario", "Almacenes", "Gestionar almacenes y traslados de mercadería"),
+        ("Caja", "Caja", "Apertura, movimientos (ingreso/egreso) y cierre de caja"),
+        ("Ventas", "Ventas", "Registrar ventas POS y gestionar cotizaciones"),
+        ("Seguridad", "Roles", "Gestionar roles de usuario"),
+        ("Seguridad", "Permisos", "Configurar permisos granulares del sistema"),
+        ("Seguridad", "Accesos", "Asignar módulos del sidebar a roles"),
+        ("Seguridad", "Usuarios", "Gestionar usuarios y credenciales del sistema")
+    };
+}
+
+<div class="terceros-page">
+    <div class="terceros-header">
+        <h1>Seguridad</h1>
+        <p>Gestione accesos, roles, permisos y usuarios del sistema</p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="terceros-tabs">
+        <a href="/Seguridad" class="tab"><i class="fa-solid fa-user-shield"></i> Roles</a>
+        <a href="/Seguridad/Permisos" class="tab"><i class="fa-solid fa-key"></i> Permisos</a>
+        <a href="/Seguridad/AccesosPorRol" class="tab active"><i class="fa-solid fa-universal-access"></i> Accesos por Rol</a>
+        <a href="/Seguridad/Usuarios" class="tab"><i class="fa-solid fa-users-gear"></i> Usuarios</a>
+    </div>
+
+    <!-- Card Module -->
+    <div class="terceros-card">
+        <div class="card-module-header">
+            <div>
+                <h2>Matriz de Accesos por Rol</h2>
+                <p>Seleccione un rol para configurar los módulos visibles en su sidebar</p>
+            </div>
+        </div>
+
+        <!-- Role Selector -->
+        <div class="row mb-4">
+            <div class="col-12 col-md-4">
+                <label class="form-label">Rol a Configurar</label>
+                <select id="selRol" class="form-select">
+                    <option value="">-- Seleccione un Rol --</option>
+                    @foreach (var r in roles)
+                    {
+                        <!option value="@r.id_rol" @(idRolSel == r.id_rol ? "selected" : "")>@r.nombre</!option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        @if (idRolSel.HasValue)
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width: 200px;">Módulo</th>
+                            <th style="width: 200px;">Submódulo</th>
+                            <th>Descripción</th>
+                            <th style="width: 150px;" class="text-center">Tiene Acceso</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in itemsMatriz)
+                        {
+                            var tieneAcceso = accesos.Any(a => a.modulo == item.Modulo && a.submodulo == item.Submodulo && a.tiene_acceso);
+                            <tr>
+                                <td>@item.Modulo</td>
+                                <td><span class="badge" style="background-color: rgba(249, 115, 22, 0.12); color: var(--accent);">@item.Submodulo</span></td>
+                                <td class="text-muted small">@item.Descripcion</td>
+                                <td class="text-center">
+                                    <div class="form-check form-switch d-inline-block">
+                                        <input class="form-check-input acceso-chk" type="checkbox" role="switch" 
+                                               data-modulo="@item.Modulo" data-submodulo="@item.Submodulo"
+                                               @(tieneAcceso ? "checked" : "") />
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4 text-end">
+                <button id="btnGuardarAccesos" class="btn-primary-mp px-4 py-2">
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar Accesos
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="fa-solid fa-user-shield fa-3x mb-3 text-opacity-25"></i>
+                <p>Por favor seleccione un rol de la lista para ver y editar su matriz de accesos.</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Cambio de Rol
+            $('#selRol').on('change', function() {
+                var val = $(this).val();
+                if (val) {
+                    window.location.href = '/Seguridad/AccesosPorRol?id_rol=' + val;
+                } else {
+                    window.location.href = '/Seguridad/AccesosPorRol';
+                }
+            });
+
+            // Guardar Accesos
+            $('#btnGuardarAccesos').on('click', function() {
+                var idRol = $('#selRol').val();
+                if (!idRol) return;
+
+                var data = [];
+                $('.acceso-chk').each(function() {
+                    data.push({
+                        modulo: $(this).data('modulo'),
+                        submodulo: $(this).data('submodulo'),
+                        tiene_acceso: $(this).is(':checked')
+                    });
+                });
+
+                $.ajax({
+                    url: '/Seguridad/GuardarTodosAccesos?id_rol=' + idRol,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function(res) {
+                        if (res.ok) {
+                            showAlert(res.msg || 'Accesos guardados correctamente', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg, 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error en la comunicación con el servidor', 'error');
+                    }
+                });
+            });
+        });
+    </script>
+}

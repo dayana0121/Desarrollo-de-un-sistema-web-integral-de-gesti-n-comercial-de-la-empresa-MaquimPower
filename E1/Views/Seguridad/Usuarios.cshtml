@@ -1,0 +1,283 @@
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+    var usuarios = ViewBag.Usuarios as List<dynamic> ?? new List<dynamic>();
+    var roles = ViewBag.Roles as List<E1.Models.Rol> ?? new List<E1.Models.Rol>();
+}
+
+<div class="terceros-page">
+    <div class="terceros-header">
+        <h1>Seguridad</h1>
+        <p>Gestione accesos, roles, permisos y usuarios del sistema</p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="terceros-tabs">
+        <a href="/Seguridad" class="tab"><i class="fa-solid fa-user-shield"></i> Roles</a>
+        <a href="/Seguridad/Permisos" class="tab"><i class="fa-solid fa-key"></i> Permisos</a>
+        <a href="/Seguridad/AccesosPorRol" class="tab"><i class="fa-solid fa-universal-access"></i> Accesos por Rol</a>
+        <a href="/Seguridad/Usuarios" class="tab active"><i class="fa-solid fa-users-gear"></i> Usuarios</a>
+    </div>
+
+    <!-- Card Module -->
+    <div class="terceros-card">
+        <div class="card-module-header">
+            <div>
+                <h2>Usuarios del Sistema</h2>
+                <p>Gestión de credenciales y asignación de roles de acceso</p>
+            </div>
+            <button class="btn-primary-mp" data-bs-toggle="modal" data-bs-target="#modalCrearUsuario">
+                <i class="fa-solid fa-user-plus"></i> Nuevo Usuario
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table id="tblUsuarios" class="table table-hover align-middle w-100">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">ID</th>
+                        <th>Nombre Completo</th>
+                        <th>Nombre de Usuario</th>
+                        <th>Rol</th>
+                        <th>Bloqueado</th>
+                        <th>Estado</th>
+                        <th style="width: 120px;" class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in usuarios)
+                    {
+                        <tr>
+                            <td>@u.id_usuario</td>
+                            <td>@u.nombre</td>
+                            <td><code style="color: var(--accent);">@u.username</code></td>
+                            <td>
+                                <span class="badge" style="background-color: rgba(249, 115, 22, 0.12); color: var(--accent);">
+                                    @u.nombre_rol
+                                </span>
+                            </td>
+                            <td>
+                                @if (u.bloqueado)
+                                {
+                                    <span class="badge" style="background-color: rgba(239, 68, 68, 0.15); color: #ef4444;">Bloqueado</span>
+                                }
+                                else
+                                {
+                                    <span class="badge" style="background-color: rgba(16, 185, 129, 0.15); color: #10b981;">Activo</span>
+                                }
+                            </td>
+                            <td>
+                                @if (u.estado)
+                                {
+                                    <span class="badge-active">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-inactive">Inactivo</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <button class="action-btn btn-edit me-1" onclick="editarUsuario(@u.id_usuario, '@u.nombre', '@u.username', '@u.nombre_rol', @(u.bloqueado ? "true" : "false"), @(u.estado ? "true" : "false"))">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button class="action-btn btn-delete" onclick="eliminarUsuario(@u.id_usuario, '@u.nombre')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Crear Usuario -->
+<div class="modal fade" id="modalCrearUsuario" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-user-plus text-warning me-2"></i> Crear Nuevo Usuario</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="frmCrearUsuario">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre Completo</label>
+                        <input type="text" name="nombre" class="form-control-custom w-100" placeholder="Ej. Juan Pérez" required maxlength="100" autocomplete="off" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de Usuario (Username)</label>
+                        <input type="text" name="username" class="form-control-custom w-100" placeholder="Ej. jperez" required maxlength="50" autocomplete="off" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" name="password_hash" class="form-control-custom w-100" placeholder="••••••••" required maxlength="50" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rol Asignado</label>
+                        <select name="id_rol" class="form-select w-100" required>
+                            <option value="">-- Seleccione un Rol --</option>
+                            @foreach (var r in roles)
+                            {
+                                <option value="@r.id_rol">@r.nombre</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary-mp" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-primary-mp">Crear Usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Usuario -->
+<div class="modal fade" id="modalEditarUsuario" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-user-pen text-warning me-2"></i> Editar Usuario</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="frmEditarUsuario">
+                <input type="hidden" name="id_usuario" id="edit_id_usuario" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre Completo</label>
+                        <input type="text" name="nombre" id="edit_nombre" class="form-control-custom w-100" required maxlength="100" autocomplete="off" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de Usuario</label>
+                        <input type="text" name="username" id="edit_username" class="form-control-custom w-100" required maxlength="50" autocomplete="off" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nueva Contraseña (Opcional, dejar vacío para no cambiar)</label>
+                        <input type="password" name="nueva_password" class="form-control-custom w-100" placeholder="Ej. ••••••••" maxlength="50" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rol Asignado</label>
+                        <select name="id_rol" id="edit_id_rol" class="form-select w-100" required>
+                            @foreach (var r in roles)
+                            {
+                                <option value="@r.id_rol">@r.nombre</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Bloqueado</label>
+                        <select name="bloqueado" id="edit_bloqueado" class="form-select w-100">
+                            <option value="false">Activo (Desbloqueado)</option>
+                            <option value="true">Bloqueado</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Estado</label>
+                        <select name="estado" id="edit_estado" class="form-select w-100">
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary-mp" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-primary-mp">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#tblUsuarios').DataTable();
+
+            // Submit Crear Usuario
+            $('#frmCrearUsuario').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/Seguridad/CrearUsuario',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(res) {
+                        if (res.ok) {
+                            $('#modalCrearUsuario').modal('hide');
+                            showAlert(res.msg, 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg, 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error en la comunicación con el servidor', 'error');
+                    }
+                });
+            });
+
+            // Submit Editar Usuario
+            $('#frmEditarUsuario').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/Seguridad/ActualizarUsuario',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(res) {
+                        if (res.ok) {
+                            $('#modalEditarUsuario').modal('hide');
+                            showAlert(res.msg, 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg, 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error en la comunicación con el servidor', 'error');
+                    }
+                });
+            });
+        });
+
+        function editarUsuario(id, nombre, username, nombre_rol, bloqueado, estado) {
+            $('#edit_id_usuario').val(id);
+            $('#edit_nombre').val(nombre);
+            $('#edit_username').val(username);
+            
+            // Buscar y seleccionar el ID del rol a partir de su nombre
+            var rolId = $('#edit_id_rol option').filter(function() {
+                return $(this).text().trim() === nombre_rol;
+            }).val();
+            $('#edit_id_rol').val(rolId);
+            
+            $('#edit_bloqueado').val(bloqueado.toString());
+            $('#edit_estado').val(estado.toString());
+            
+            // Limpiar contraseña anterior
+            $('input[name="nueva_password"]').val('');
+            
+            $('#modalEditarUsuario').modal('show');
+        }
+
+        function eliminarUsuario(id, nombre) {
+            if (confirm(`¿Está seguro de que desea desactivar al usuario "${nombre}"?`)) {
+                $.ajax({
+                    url: '/Seguridad/EliminarUsuario',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function(res) {
+                        if (res.ok) {
+                            showAlert(res.msg || 'Usuario desactivado correctamente', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg || 'No se pudo desactivar al usuario', 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error al procesar la solicitud', 'error');
+                    }
+                });
+            }
+        }
+    </script>
+}

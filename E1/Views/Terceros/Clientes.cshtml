@@ -1,0 +1,210 @@
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+<div class="terceros-page">
+
+    <div class="terceros-header">
+        <h1>Terceros</h1>
+        <p>Gestione sus clientes y proveedores</p>
+    </div>
+
+    <div class="terceros-info" style="margin-top: 0; margin-bottom: 24px;">
+        <div class="info-icon">
+            <i class="fa-solid fa-circle-info"></i>
+        </div>
+
+        <div>
+            <h3>Información</h3>
+            <p>Los clientes son las personas o empresas que compran sus productos o servicios.</p>
+            <p>Los proveedores son las empresas que le venden mercadería o servicios.</p>
+        </div>
+    </div>
+
+    <div class="terceros-tabs">
+        <a href="/Terceros/Clientes" class="tab active">
+            <i class="fa-solid fa-users"></i> Clientes
+        </a>
+
+        <a href="/Terceros/Proveedores" class="tab">
+            <i class="fa-solid fa-truck-field"></i> Proveedores
+        </a>
+    </div>
+
+    <div class="terceros-card">
+
+        <div class="card-top">
+            <div>
+                <h2>Lista de Clientes</h2>
+                <p>Administre personas naturales, empresas y consumidores finales</p>
+            </div>
+
+            <button type="button" class="btn-orange" onclick="abrirModalNuevoCliente()">
+                <i class="fa-solid fa-plus"></i>
+                Nuevo Cliente
+            </button>
+        </div>
+
+        <div class="filters">
+            <div>
+                <label>Buscar por DNI, RUC o Nombre</label>
+                <input id="buscarCliente" placeholder="Ej. 74581236 / Juan Pérez..." />
+            </div>
+
+            <div>
+                <label>Tipo Documento</label>
+                <select id="filtroTipoDocumento">
+                    <option value="">-- Todos --</option>
+                    <option value="DNI">DNI</option>
+                    <option value="RUC">RUC</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Estado</label>
+                <select id="filtroEstado">
+                    <option value="">-- Todos --</option>
+                    <option value="Activo" selected>Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn-orange" onclick="filtrarClientes()">
+                <i class="fa-solid fa-filter"></i> Filtrar
+            </button>
+
+            <button type="button" class="btn-reset" onclick="limpiarFiltrosClientes()">
+                <i class="fa-solid fa-rotate-right"></i>
+            </button>
+        </div>
+
+        <table id="tblClientes" class="display terceros-table" style="width:100%">
+            <thead>
+                <tr>
+                    <th>DOCUMENTO</th>
+                    <th>NOMBRE / RAZÓN SOCIAL</th>
+                    <th>TELÉFONO</th>
+                    <th>EMAIL</th>
+                    <th>DIRECCIÓN</th>
+                    <th>ESTADO</th>
+                    <th>ACCIONES</th>
+                </tr>
+            </thead>
+        </table>
+
+    </div>
+
+
+
+</div>
+
+<div class="modal fade" id="modalCliente" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-mp">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloModalCliente">Nuevo Cliente</h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <form id="formCliente">
+                <div class="modal-body">
+
+                    <input type="hidden" id="id_cliente" name="id_cliente" value="0" />
+
+                    <div class="mb-3">
+                        <label>Tipo Documento</label>
+                        <select id="tipo_documento"
+                                name="tipo_documento"
+                                class="form-control input-mp"
+                                required>
+                            <option value="">Seleccione</option>
+                            <option value="DNI">DNI</option>
+                            <option value="RUC">RUC</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Número Documento</label>
+
+                        <input id="numero_documento"
+                               name="numero_documento"
+                               type="text"
+                               inputmode="numeric"
+                               class="form-control input-mp"
+                               maxlength="11"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Nombre Completo / Razón Social</label>
+
+                        <input id="nombre_completo"
+                               name="nombre_completo"
+                               class="form-control input-mp"
+                               maxlength="150"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Teléfono</label>
+
+                        <input id="telefono"
+                               name="telefono"
+                               type="text"
+                               inputmode="numeric"
+                               class="form-control input-mp"
+                               maxlength="9" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Email</label>
+
+                        <input id="email"
+                               name="email"
+                               type="email"
+                               class="form-control input-mp"
+                               maxlength="100" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Dirección</label>
+
+                        <input id="direccion"
+                               name="direccion"
+                               class="form-control input-mp"
+                               maxlength="200" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Estado</label>
+                        <select id="estado"
+                                name="estado"
+                                class="form-control input-mp">
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn-reset"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn-orange">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

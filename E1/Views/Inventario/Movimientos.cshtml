@@ -1,0 +1,87 @@
+﻿@{
+    ViewData["Title"] = "Movimientos / Kardex";
+}
+
+<div class="terceros-page">
+
+    <div class="terceros-header">
+        <h1>Inventario</h1>
+        <p>Movimientos de stock / Kardex</p>
+    </div>
+
+    <div class="terceros-tabs">
+        <a href="/Inventario/Index" class="tab">
+            <i class="fa-solid fa-warehouse"></i> Almacenes
+        </a>
+
+        <a href="/Inventario/Movimientos" class="tab active">
+            <i class="fa-solid fa-list-check"></i> Movimientos / Kardex
+        </a>
+
+        <a href="/Inventario/Traslados" class="tab">
+            <i class="fa-solid fa-right-left"></i> Traslados
+        </a>
+    </div>
+
+    <div class="terceros-card">
+
+        <div class="card-top">
+            <div>
+                <h2>Kardex de Productos</h2>
+                <p>Registro de entradas y salidas por producto y almacén</p>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div>
+                <label>Buscar producto, almacén o referencia</label>
+                <input id="buscarKardex" placeholder="Ej. Taladro / COMPRA / Principal..." />
+            </div>
+
+            <div>
+                <label>Tipo Movimiento</label>
+                <select id="filtroTipoMovimiento">
+                    <option value="">-- Todos --</option>
+                    <option value="ENTRADA">ENTRADA</option>
+                    <option value="SALIDA">SALIDA</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Referencia</label>
+                <select id="filtroTipoReferencia">
+                    <option value="">-- Todos --</option>
+                    <option value="COMPRA">COMPRA</option>
+                    <option value="VENTA">VENTA</option>
+                    <option value="TRASLADO">TRASLADO</option>
+                    <option value="AJUSTE">AJUSTE</option>
+                </select>
+            </div>
+
+            <button type="button" class="btn-orange" onclick="filtrarKardex()">
+                <i class="fa-solid fa-filter"></i> Filtrar
+            </button>
+
+            <button type="button" class="btn-reset" onclick="limpiarFiltrosKardex()">
+                <i class="fa-solid fa-rotate-right"></i>
+            </button>
+        </div>
+
+        <table id="tblKardex" class="display terceros-table" style="width:100%">
+            <thead>
+                <tr>
+                    <th>FECHA</th>
+                    <th>PRODUCTO</th>
+                    <th>ALMACÉN</th>
+                    <th>MOVIMIENTO</th>
+                    <th>REFERENCIA</th>
+                    <th>CANTIDAD</th>
+                    <th>STOCK ANTERIOR</th>
+                    <th>STOCK FINAL</th>
+                    <th>OBSERVACIÓN</th>
+                </tr>
+            </thead>
+        </table>
+
+    </div>
+</div>

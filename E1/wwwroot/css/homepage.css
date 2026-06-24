@@ -1,0 +1,663 @@
+/* ============================================================
+   MaquimPower - Estilos de la Página de Inicio (Landing Page)
+   ============================================================ */
+
+.landing-wrapper {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #1c1917;
+    background: #fcfbf9;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.landing-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background: #ffffff;
+    border-bottom: 1px solid #e7e5e4;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+
+.landing-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 20px;
+    color: #1c1917;
+    text-decoration: none;
+    letter-spacing: -0.5px;
+}
+
+.landing-logo i {
+    color: var(--accent);
+    font-size: 22px;
+}
+
+.landing-nav-links {
+    display: flex;
+    gap: 30px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.landing-nav-links a {
+    color: #57524d;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.15s ease;
+}
+
+.landing-nav-links a:hover {
+    color: var(--accent);
+}
+
+.landing-btn-login {
+    background: var(--accent);
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.landing-btn-login:hover {
+    background: #e0630f;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
+    transform: translateY(-1px);
+}
+
+/* Brown Banner (Hero) */
+.landing-banner {
+    padding: 90px 20px;
+    text-align: center;
+    background: linear-gradient(135deg, #1c120c 0%, #100a07 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.landing-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(249, 115, 22, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.banner-title-main {
+    font-size: 54px;
+    font-weight: 900;
+    color: #ffffff !important;
+    letter-spacing: 2px;
+    line-height: 1.1;
+    margin: 0;
+}
+
+.banner-title-accent {
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--accent) !important;
+    letter-spacing: 2px;
+    line-height: 1;
+    margin: 5px 0 15px 0;
+}
+
+.banner-subtitle {
+    font-size: 16px;
+    color: #d6d3d1 !important;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    max-width: 600px;
+    margin: 0;
+    opacity: 0.9;
+}
+
+/* Quiénes Somos */
+.landing-about {
+    padding: 80px 40px;
+    background: #fcfbf9;
+    display: flex;
+    justify-content: center;
+}
+
+.landing-about-container {
+    max-width: 800px;
+    width: 100%;
+}
+
+.about-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1c1917 !important;
+    margin-bottom: 30px;
+    letter-spacing: -0.5px;
+}
+
+.about-title span {
+    color: var(--accent) !important;
+}
+
+.about-text {
+    font-size: 15px;
+    line-height: 1.75;
+    color: #57524d !important;
+    margin-bottom: 20px;
+    text-align: justify;
+}
+
+.about-text:last-child {
+    margin-bottom: 0;
+}
+
+/* Visión y Misión */
+.landing-vision-mision {
+    padding: 60px 40px;
+    background: #f5f4f0;
+}
+
+.vision-mision-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.vision-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 40px;
+    border-top: 5px solid var(--accent);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.vision-card h3 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1c1917 !important;
+    margin-bottom: 20px;
+}
+
+.vision-card p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #57524d !important;
+}
+
+.mision-card {
+    background: #1c1917;
+    border-radius: 14px;
+    padding: 40px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.mision-card::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    right: -50px;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.mision-card h3 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--accent) !important;
+    margin-bottom: 20px;
+}
+
+.mision-card p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #d6d3d1 !important;
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 2;
+}
+
+.mision-card p:last-child {
+    margin-bottom: 0;
+}
+
+.mision-rocket {
+    position: absolute;
+    top: 35px;
+    right: 35px;
+    font-size: 48px;
+    color: rgba(255, 255, 255, 0.95);
+    transform: rotate(45deg);
+    pointer-events: none;
+}
+
+/* Nuestros Valores */
+.landing-valores {
+    padding: 80px 40px;
+    background: #fcfbf9;
+    text-align: center;
+}
+
+.valores-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1c1917 !important;
+    margin-bottom: 40px;
+    position: relative;
+    display: inline-block;
+}
+
+.valores-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background-color: var(--accent);
+    border-radius: 2px;
+}
+
+.valores-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.valor-card {
+    background: #ffffff;
+    border: 1px solid #f0eee9;
+    border-radius: 12px;
+    padding: 35px 24px;
+    width: 260px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.valor-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(249, 115, 22, 0.4);
+    box-shadow: 0 12px 30px rgba(249, 115, 22, 0.08);
+}
+
+.valor-card.highlighted {
+    border-color: rgba(249, 115, 22, 0.5);
+    box-shadow: 0 8px 25px rgba(249, 115, 22, 0.08);
+}
+
+.valor-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    background-color: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px auto;
+    box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);
+}
+
+.valor-icon-wrapper i {
+    color: #ffffff !important;
+    font-size: 24px;
+}
+
+.valor-card h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1c1917 !important;
+    margin-bottom: 12px;
+}
+
+.valor-card p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #78716c !important;
+    margin: 0;
+}
+
+/* Footer / Contacto */
+.landing-footer {
+    background: #1c1e22; /* Dark elegant slate/charcoal color from mockup */
+    color: #94a3b8;
+    padding: 60px 20px 30px 20px;
+    width: 100%;
+    position: relative;
+}
+
+.landing-footer-orange-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background-color: var(--accent); /* Orange bar from mockup */
+}
+
+.landing-footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.landing-footer-info {
+    flex: 1 1 300px;
+}
+
+.footer-logo {
+    font-size: 24px;
+    font-weight: 900;
+    margin-bottom: 25px;
+    letter-spacing: -0.5px;
+}
+
+.footer-logo-white {
+    color: #ffffff !important;
+}
+
+.footer-logo-orange {
+    color: var(--accent) !important;
+}
+
+.landing-footer-info p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: #a8a29e !important;
+}
+
+.landing-footer-info p span {
+    color: #d6d3d1 !important;
+}
+
+.footer-icon-orange {
+    color: var(--accent) !important;
+    font-size: 16px;
+    margin-top: 3px;
+}
+
+.footer-icon-green {
+    color: #10b981 !important; /* WhatsApp green */
+    font-size: 18px;
+    margin-top: 3px;
+}
+
+.footer-social-links {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.footer-social-links a {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #374151;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8 !important;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.footer-social-links a:hover {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff !important;
+    transform: translateY(-2px);
+}
+
+.landing-footer-column {
+    flex: 1 1 180px;
+}
+
+.landing-footer-column h4 {
+    color: #ffffff !important;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #374151;
+    padding-bottom: 8px;
+}
+
+.landing-footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.landing-footer-column ul li {
+    margin-bottom: 12px;
+}
+
+.landing-footer-column ul li a {
+    color: #94a3b8 !important;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.15s ease;
+}
+
+.landing-footer-column ul li a:hover {
+    color: var(--accent) !important;
+}
+
+.footer-book-icon {
+    font-size: 40px;
+    color: rgba(255, 255, 255, 0.85);
+    margin-top: 20px;
+}
+
+.landing-footer-bottom {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #2d3139;
+    font-size: 13px;
+    width: 100%;
+    color: #64748b !important;
+}
+
+/* Specific visibility overrides for landing elements in light theme */
+.landing-wrapper,
+.landing-wrapper a:not(.landing-btn-login),
+.landing-wrapper h1,
+.landing-wrapper h2,
+.landing-wrapper h3,
+.landing-wrapper h4,
+.landing-wrapper p,
+.landing-wrapper span,
+.landing-wrapper li {
+    color: #1c1917 !important;
+}
+
+.landing-wrapper span.badge,
+.landing-wrapper span.text-warning,
+.landing-wrapper h1 span {
+    color: var(--accent) !important;
+}
+
+.landing-footer,
+.landing-footer h4,
+.landing-footer p,
+.landing-footer span,
+.landing-footer-bottom {
+    color: #94a3b8 !important;
+}
+.landing-footer h4 {
+    color: #ffffff !important;
+}
+.landing-footer i {
+    color: var(--accent) !important;
+}
+
+/* Specific overrides with higher specificity to keep layout colors correct */
+.landing-banner .banner-title-main {
+    color: #ffffff !important;
+}
+
+.landing-banner .banner-title-accent {
+    color: var(--accent) !important;
+}
+
+.landing-banner .banner-subtitle {
+    color: #e2e8f0 !important;
+}
+
+.landing-vision-mision .mision-card h3 {
+    color: var(--accent) !important;
+}
+
+.landing-vision-mision .mision-card p {
+    color: #ffffff !important;
+}
+
+.landing-about-row {
+    display: flex;
+    gap: 50px;
+    max-width: 1200px;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.landing-about-content {
+    flex: 1 1 550px;
+}
+
+.landing-about-media {
+    flex: 1 1 400px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.logo-card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+    padding: 40px;
+    width: 100%;
+    max-width: 440px;
+    height: 380px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border: 1px solid #f0eee9;
+}
+
+.about-logo-img {
+    max-width: 85%;
+    max-height: 75%;
+    object-fit: contain;
+}
+
+.default-logo-placeholder {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.mp-symbol {
+    font-size: 84px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -2px;
+    font-style: italic;
+    background: linear-gradient(135deg, #ff8c00 0%, #ff5500 100%);
+    -webkit-background-clip: text;
+}
+
+.mp-text {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -1px;
+}
+
+.mp-text .white-text {
+    color: #1c1917 !important;
+}
+
+.mp-text .orange-text {
+    color: var(--accent) !important;
+}
+
+.satisfied-clients-badge {
+    position: absolute;
+    bottom: -20px;
+    right: 20px;
+    background-color: var(--accent);
+    color: #ffffff !important;
+    padding: 12px 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.2;
+    z-index: 10;
+}
+
+.satisfied-clients-badge .badge-number {
+    font-size: 18px;
+    font-weight: 800;
+    color: #ffffff !important;
+}
+
+.satisfied-clients-badge .badge-text {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.9) !important;
+}

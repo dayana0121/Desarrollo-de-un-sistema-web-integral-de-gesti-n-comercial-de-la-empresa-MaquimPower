@@ -1,0 +1,257 @@
+﻿@{
+    ViewData["Title"] = "Punto de Venta";
+    var clientes = ViewBag.Clientes as List<E1.Models.Cliente> ?? new List<E1.Models.Cliente>();
+    var almacenes = ViewBag.Almacenes as List<E1.Models.Almacen> ?? new List<E1.Models.Almacen>();
+    int idCaja = ViewBag.IdCaja ?? 0;
+    string nombreCaja = ViewBag.NombreCaja ?? "";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0" style="font-weight:800;color:var(--text-primary);">Ventas</h1>
+            <p class="text-muted mb-0">Gestione ventas, cotizaciones y estados</p>
+        </div>
+        <span style="background:#22c55e22;color:#22c55e;padding:6px 16px;border-radius:20px;font-weight:700;font-size:14px;">
+            <i class="fa-solid fa-cash-register me-1"></i>@nombreCaja
+        </span>
+    </div>
+
+    <div class="module-tabs">
+        <a href="/Ventas/POS" class="active">POS</a>
+        <a href="/Ventas/Historial">Historial</a>
+        <a href="/Ventas/Cotizaciones">Cotizaciones</a>
+        <a href="/Ventas/Estados">Estados</a>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="row g-3">
+        <!-- Izquierda -->
+        <div class="col-md-4">
+            <div class="card-module mb-3">
+                <div class="card-module-header">
+                    <div><h2>Configuración</h2><p>Cliente, almacén y comprobante</p></div>
+                </div>
+                <div class="p-3">
+                    <div class="mb-2">
+                        <label class="form-label">Cliente</label>
+                        <select id="pos_cliente" class="form-select">
+                            <option value="">Selecciona...</option>
+                            @foreach (var c in clientes)
+                            {
+                                <option value="@c.id_cliente">@c.nombre_completo</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Almacén</label>
+                        <select id="pos_almacen" class="form-select">
+                            @foreach (var a in almacenes)
+                            {
+                                <option value="@a.id_almacen">@a.nombre</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label">Comprobante</label>
+                            <select id="pos_comprobante" class="form-select">
+                                <option value="Boleta">Boleta</option>
+                                <option value="Factura">Factura</option>
+                                <option value="Ticket">Ticket</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Pago</label>
+                            <select id="pos_metodo" class="form-select">
+                                <option value="Efectivo">Efectivo</option>
+                                <option value="Tarjeta">Tarjeta</option>
+                                <option value="Transferencia">Transferencia</option>
+                                <option value="Yape">Yape</option>
+                                <option value="Plin">Plin</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-module">
+                <div class="card-module-header">
+                    <div><h2>Buscar Producto</h2><p>Por nombre o código SKU</p></div>
+                </div>
+                <div class="p-3">
+                    <div class="input-group mb-1">
+                        <input type="text" id="pos_busq" class="form-control" placeholder="Nombre o SKU..." />
+                        <button class="btn-primary-mp" style="border-radius:0 8px 8px 0;" onclick="buscarProductoPOS()">
+                            <i class="fa-solid fa-search"></i>
+                        </button>
+                    </div>
+                    <div id="pos_resultados" class="list-group mt-1" style="display:none;max-height:220px;overflow-y:auto;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Derecha -->
+        <div class="col-md-8">
+            <div class="card-module mb-3">
+                <div class="card-module-header">
+                    <div><h2>Carrito</h2><p>Productos seleccionados para esta venta</p></div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle w-100">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th style="width:80px">Cant.</th>
+                                <th style="width:100px">Precio</th>
+                                <th style="width:90px">Desc.</th>
+                                <th style="width:100px" class="text-end">Subtotal</th>
+                                <th style="width:40px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="pos_tbody">
+                            <tr id="pos_empty"><td colspan="6" class="text-center text-muted py-4">Sin productos. Usa el buscador.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card-module">
+                <div class="p-3">
+                    <div class="row g-3 align-items-end mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Descuento global (S/)</label>
+                            <input type="number" id="pos_desc" class="form-control" min="0" step="0.01" value="0" oninput="calcularTotales()" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Monto pagado (S/)</label>
+                            <input type="number" id="pos_pagado" class="form-control" min="0" step="0.01" value="0" oninput="calcularVuelto()" />
+                        </div>
+                        <div class="col-md-3">
+                            <div style="background:var(--bg-tertiary);border-radius:10px;padding:12px;text-align:center;">
+                                <div class="text-muted small">TOTAL</div>
+                                <div class="fw-bold" style="font-size:1.8rem;color:#22c55e;" id="pos_total_display">S/ 0.00</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div style="background:var(--bg-tertiary);border-radius:10px;padding:12px;text-align:center;">
+                                <div class="text-muted small">VUELTO</div>
+                                <div class="fw-bold" style="font-size:1.5rem;color:#3b82f6;" id="pos_vuelto_display">S/ 0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-primary-mp w-100" style="padding:14px;font-size:1rem;" onclick="confirmarVenta()">
+                        <i class="fa-solid fa-check-circle me-2"></i>CONFIRMAR VENTA
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let posItems = [];
+        const ID_CAJA = @idCaja;
+
+        async function buscarProductoPOS() {
+            const q = document.getElementById('pos_busq').value.trim();
+            if (!q) return;
+            const res = await fetch('/Ventas/BuscarProductos?q=' + encodeURIComponent(q));
+            const lista = await res.json();
+            const div = document.getElementById('pos_resultados');
+            div.innerHTML = '';
+            if (lista.length === 0) { div.style.display = 'none'; return; }
+            lista.forEach(p => {
+                const a = document.createElement('a');
+                a.href = '#';
+                a.className = 'list-group-item list-group-item-action small';
+                a.textContent = p.nombre + ' | S/ ' + p.precio_venta.toFixed(2) + ' | Stock: ' + p.stock_actual;
+                a.onclick = (e) => { e.preventDefault(); agregarProductoPOS(p); div.style.display = 'none'; document.getElementById('pos_busq').value = ''; };
+                div.appendChild(a);
+            });
+            div.style.display = 'block';
+        }
+
+        function agregarProductoPOS(p) {
+            const existe = posItems.find(x => x.id_producto === p.id_producto);
+            if (existe) { existe.cantidad++; }
+            else { posItems.push({ id_producto: p.id_producto, nombre: p.nombre, cantidad: 1, precio_unitario: p.precio_venta, descuento: 0 }); }
+            renderPOS();
+        }
+
+        function renderPOS() {
+            const tbody = document.getElementById('pos_tbody');
+            tbody.innerHTML = '';
+            if (posItems.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Sin productos. Usa el buscador.</td></tr>';
+                calcularTotales(); return;
+            }
+            posItems.forEach((item, i) => {
+                const sub = item.cantidad * item.precio_unitario - item.descuento;
+                const tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td class="small">' + item.nombre + '</td>' +
+                    '<td><input type="number" class="form-control form-control-sm" min="1" value="' + item.cantidad + '" oninput="posItems[' + i + '].cantidad=+this.value;renderPOS()" /></td>' +
+                    '<td><input type="number" class="form-control form-control-sm" min="0" step="0.01" value="' + item.precio_unitario + '" oninput="posItems[' + i + '].precio_unitario=+this.value;renderPOS()" /></td>' +
+                    '<td><input type="number" class="form-control form-control-sm" min="0" step="0.01" value="' + item.descuento + '" oninput="posItems[' + i + '].descuento=+this.value;renderPOS()" /></td>' +
+                    '<td class="text-end fw-semibold" style="color:#22c55e;">S/ ' + sub.toFixed(2) + '</td>' +
+                    '<td><button class="action-btn btn-delete" onclick="posItems.splice(' + i + ',1);renderPOS()"><i class="fa-solid fa-times"></i></button></td>';
+                tbody.appendChild(tr);
+            });
+            calcularTotales();
+        }
+
+        function calcularTotales() {
+            const subtotal = posItems.reduce((s, x) => s + (x.cantidad * x.precio_unitario - x.descuento), 0);
+            const desc = parseFloat(document.getElementById('pos_desc').value) || 0;
+            const total = Math.max(0, subtotal - desc);
+            document.getElementById('pos_total_display').textContent = 'S/ ' + total.toFixed(2);
+            calcularVuelto();
+        }
+
+        function calcularVuelto() {
+            const total = parseFloat(document.getElementById('pos_total_display').textContent.replace('S/ ', '')) || 0;
+            const pagado = parseFloat(document.getElementById('pos_pagado').value) || 0;
+            document.getElementById('pos_vuelto_display').textContent = 'S/ ' + Math.max(0, pagado - total).toFixed(2);
+        }
+
+        async function confirmarVenta() {
+            const id_cliente = parseInt(document.getElementById('pos_cliente').value);
+            const id_almacen = parseInt(document.getElementById('pos_almacen').value);
+            if (!id_cliente) { showAlert('Selecciona un cliente', 'error'); return; }
+            if (!id_almacen) { showAlert('Selecciona un almacén', 'error'); return; }
+            if (posItems.length === 0) { showAlert('Agrega productos al carrito', 'error'); return; }
+            const total = parseFloat(document.getElementById('pos_total_display').textContent.replace('S/ ', '')) || 0;
+            const pagado = parseFloat(document.getElementById('pos_pagado').value) || 0;
+            if (pagado < total) { showAlert('El monto pagado es menor al total', 'error'); return; }
+            const payload = {
+                id_cliente,
+                id_caja: ID_CAJA,
+                id_almacen,
+                tipo_comprobante: document.getElementById('pos_comprobante').value,
+                metodo_pago: document.getElementById('pos_metodo').value,
+                descuento: parseFloat(document.getElementById('pos_desc').value) || 0,
+                monto_pagado: pagado,
+                productos: posItems
+            };
+            const res = await fetch('/Ventas/RegistrarPOS', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.ok) {
+                showAlert('Venta ' + data.numeroVenta + ' registrada | Total: S/ ' + data.total.toFixed(2) + ' | Vuelto: S/ ' + data.vuelto.toFixed(2), 'success');
+                posItems = [];
+                renderPOS();
+                document.getElementById('pos_desc').value = '0';
+                document.getElementById('pos_pagado').value = '0';
+            } else showAlert('Error: ' + data.msg, 'error');
+        }
+    </script>
+}

@@ -1,0 +1,104 @@
+@{
+    ViewData["Title"] = "Acceso Denegado";
+    Layout = null; // Pagina sin sidebar/topbar para no confundir
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acceso Denegado - MaquimPower</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        body { 
+            background: #0c0a09; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sinacceso-card {
+            background: #1c1917;
+            border: 1px solid #2e2a24;
+            border-radius: 16px;
+            padding: 48px 40px;
+            text-align: center;
+            max-width: 480px;
+            width: 100%;
+        }
+        .sinacceso-icon {
+            font-size: 56px;
+            color: #ef4444;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .sinacceso-card h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #f5f5f4;
+            margin-bottom: 12px;
+        }
+        .sinacceso-card p {
+            font-size: 14px;
+            color: #a8a29e;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .btn-back {
+            background: #f97316;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 11px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .btn-back:hover { background: #ea6c00; color: #fff; }
+        .btn-logout {
+            background: transparent;
+            color: #78716c;
+            border: 1px solid #2e2a24;
+            border-radius: 8px;
+            padding: 11px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 12px;
+            transition: all 0.2s;
+        }
+        .btn-logout:hover { border-color: #ef4444; color: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="sinacceso-card">
+        <i class="fa-solid fa-lock sinacceso-icon"></i>
+        <h1>Acceso Denegado</h1>
+        <p>
+            No tienes permisos para acceder a este módulo.<br/>
+            Contacta al <strong style="color: #f97316;">Administrador del sistema</strong> 
+            para solicitar acceso.
+        </p>
+        <div>
+            <a href="javascript:history.back()" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i> Volver
+            </a>
+            <a href="/Login/Logout" class="btn-logout">
+                <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesion
+            </a>
+        </div>
+    </div>
+</body>
+</html>

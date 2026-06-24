@@ -1,0 +1,234 @@
+@{
+    ViewData["Title"] = "Gestión de Marcas";
+    var marcas = ViewBag.Marcas as List<E1.Models.Marca> ?? new List<E1.Models.Marca>();
+}
+
+<div class="terceros-page">
+    <div class="terceros-header">
+        <h1>Productos</h1>
+        <p>Gestione el catálogo de categorías, marcas, proveedores y productos</p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="terceros-tabs">
+        <a href="/Productos" class="tab"><i class="fa-solid fa-box"></i> Productos</a>
+        <a href="/Productos/Categorias" class="tab"><i class="fa-solid fa-tags"></i> Categorías</a>
+        <a href="/Productos/Marcas" class="tab active"><i class="fa-solid fa-trademark"></i> Marcas</a>
+    </div>
+
+    <!-- Card Module -->
+    <div class="terceros-card">
+        <div class="card-module-header">
+            <div>
+                <h2>Marcas de Productos</h2>
+                <p>Configure los fabricantes o marcas de los productos de su almacén</p>
+            </div>
+            <button class="btn-primary-mp" data-bs-toggle="modal" data-bs-target="#modalCrearMarca">
+                <i class="fa-solid fa-plus"></i> Nueva Marca
+            </button>
+        </div>
+
+        <!-- Filtros de búsqueda a nivel de controlador -->
+        <form method="get" action="/Productos/Marcas" class="row g-3 mb-4 align-items-end">
+            <div class="col-12 col-md-6 col-lg-4">
+                <label class="form-label">Buscar Marca</label>
+                <input type="text" name="busqueda" class="form-control" value="@ViewBag.Busqueda" placeholder="Nombre o código..." autocomplete="off" />
+            </div>
+            <div class="col-12 col-md-3">
+                <button type="submit" class="btn-primary-mp w-100">
+                    <i class="fa-solid fa-filter"></i> Filtrar
+                </button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table id="tblMarcas" class="table table-hover align-middle w-100">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">ID</th>
+                        <th style="width: 150px;">Código</th>
+                        <th>Nombre de Marca</th>
+                        <th>Estado</th>
+                        <th style="width: 100px;" class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var m in marcas)
+                    {
+                        <tr>
+                            <td>@m.id_marca</td>
+                            <td><code style="color: var(--accent);">@m.codigo</code></td>
+                            <td>@m.nombre</td>
+                            <td>
+                                @if (m.estado)
+                                {
+                                    <span class="badge-active">Activa</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-inactive">Inactiva</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <button class="action-btn btn-edit me-1" 
+                                        onclick="editarMarca(@m.id_marca, '@m.codigo', '@m.nombre', @(m.estado ? "true" : "false"))">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button class="action-btn btn-delete" onclick="eliminarMarca(@m.id_marca, '@m.nombre')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Crear Marca -->
+<div class="modal fade" id="modalCrearMarca" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-copyright text-warning me-2"></i> Crear Nueva Marca</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="frmCrearMarca">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Código Único</label>
+                        <input type="text" name="codigo" class="form-control" placeholder="Ej. MOBIL" required maxlength="20" autocomplete="off" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de la Marca</label>
+                        <input type="text" name="nombre" class="form-control" placeholder="Ej. Mobil 1" required maxlength="100" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary-mp" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-primary-mp">Crear Marca</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Marca -->
+<div class="modal fade" id="modalEditarMarca" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-pen text-warning me-2"></i> Editar Marca</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="frmEditarMarca">
+                <input type="hidden" name="id_marca" id="edit_id_marca" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Código Único</label>
+                        <input type="text" name="codigo" id="edit_codigo" class="form-control" required maxlength="20" autocomplete="off" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de la Marca</label>
+                        <input type="text" name="nombre" id="edit_nombre" class="form-control" required maxlength="100" autocomplete="off" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Estado</label>
+                        <select name="estado" id="edit_estado" class="form-select">
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary-mp" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-primary-mp">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#tblMarcas').DataTable({
+                dom: '<"d-flex justify-content-between align-items-center mb-3"l>rtip'
+            });
+
+            // Submit Crear Marca
+            $('#frmCrearMarca').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/Productos/CrearMarca',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(res) {
+                        if (res.ok) {
+                            $('#modalCrearMarca').modal('hide');
+                            showAlert(res.msg || 'Marca creada correctamente', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg, 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error en la comunicación con el servidor', 'error');
+                    }
+                });
+            });
+
+            // Submit Editar Marca
+            $('#frmEditarMarca').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/Productos/ActualizarMarca',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(res) {
+                        if (res.ok) {
+                            $('#modalEditarMarca').modal('hide');
+                            showAlert(res.msg || 'Marca actualizada correctamente', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg, 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error en la comunicación con el servidor', 'error');
+                    }
+                });
+            });
+        });
+
+        function editarMarca(id, codigo, nombre, estado) {
+            $('#edit_id_marca').val(id);
+            $('#edit_codigo').val(codigo);
+            $('#edit_nombre').val(nombre);
+            $('#edit_estado').val(estado.toString());
+            $('#modalEditarMarca').modal('show');
+        }
+
+        function eliminarMarca(id, nombre) {
+            if (confirm(`¿Está seguro de que desea desactivar la marca "${nombre}"?`)) {
+                $.ajax({
+                    url: '/Productos/EliminarMarca',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function(res) {
+                        if (res.ok) {
+                            showAlert(res.msg || 'Marca desactivada correctamente', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showAlert(res.msg || 'No se pudo desactivar la marca', 'error');
+                        }
+                    },
+                    error: function() {
+                        showAlert('Error al procesar la solicitud', 'error');
+                    }
+                });
+            }
+        }
+    </script>
+}
